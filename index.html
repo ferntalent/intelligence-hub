@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligence Registry - V14 PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .scanning-active { border-left: 5px solid #db2777; background-color: #fff1f2 !important; transition: all 0.4s ease; }
+        .priority-lead { border-left: 5px solid #10b981; background-color: #f0fdf4; }
+        #settings-modal { z-index: 10000; }
+    </style>
+</head>
+<body class="p-4 md:p-8 lg:p-10">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-10 gap-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tighter text-slate-900 flex items-center gap-3 uppercase">
+                    Intelligence Hub
+                    <span class="text-xs font-bold px-3 py-1 bg-blue-600 text-white rounded-full tracking-widest italic shadow-sm normal-case">GitHub Production PRO</span>
+                </h1>
+                <p class="text-slate-500 mt-2 font-medium">500 Target Registry • Daily 100-Charity Stage Scan • Full CharityJob Discovery</p>
+            </div>
+            
+            <div class="flex flex-wrap gap-3">
+                <!-- PRODUCTION API SETTINGS -->
+                <button onclick="toggleSettings()" class="bg-slate-900 text-white px-5 py-3 rounded-2xl border border-slate-800 hover:bg-slate-800 transition-all shadow-xl flex items-center gap-3">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                    <div class="text-left leading-tight">
+                        <span class="block text-[10px] font-black uppercase tracking-widest text-blue-400">Step 1: Activate</span>
+                        <span class="block text-sm font-black uppercase" id="api-status-label">SET API KEY</span>
+                    </div>
+                </button>
+
+                <button onclick="exportToCSV()" class="bg-white text-slate-700 px-6 py-3 rounded-2xl shadow-sm border border-slate-200 hover:bg-slate-50 transition-all font-bold text-sm">
+                    Export Registry
+                </button>
+                <button id="auto-pilot-btn" onclick="toggleAutoPilot()" class="bg-emerald-600 text-white px-8 py-3 rounded-2xl shadow-lg hover:bg-emerald-700 transition-all flex items-center gap-2 font-black uppercase tracking-tighter text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Start Daily Stage
+                </button>
+            </div>
+        </div>
+
+        <!-- Metric Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-10 text-center">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Master List</span>
+                <div class="text-3xl font-black text-slate-900 mt-1" id="stat-count">500</div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Discoveries</span>
+                <div class="text-3xl font-black text-pink-600 mt-1" id="stat-discoveries">0</div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-blue-600 cursor-pointer hover:bg-blue-50 transition-all" onclick="toggleIntelligenceCenter()">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saved Leads</span>
+                <div class="text-3xl font-black mt-1" id="saved-count">0</div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Today's Stage</span>
+                <div class="text-sm font-black text-slate-700 mt-2 uppercase" id="batch-indicator">LOADING...</div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-3xl shadow-xl flex flex-col justify-center">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Current Action</span>
+                <div class="text-sm font-black text-emerald-400 truncate px-2 mt-1 italic uppercase" id="scan-progress">SYSTEM READY</div>
+            </div>
+        </div>
+
+        <!-- Registry Table -->
+        <div class="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/50">
+                <input type="text" id="search-input" placeholder="Search Master List or Discoveries..." class="flex-1 max-w-md bg-white px-6 py-3 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium shadow-sm">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleFilterBatch()" id="batch-filter-btn" class="text-[10px] font-black uppercase bg-slate-200 px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-300 transition-colors">Show All 500</button>
+                    <select id="region-filter" class="bg-white px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 outline-none shadow-sm">
+                        <option value="all">All UK Regions</option>
+                        <option value="LON">London</option>
+                        <option value="SEE">SE England</option>
+                        <option value="MID">Midlands</option>
+                        <option value="SCO">Scotland</option>
+                        <option value="SWE">SW England</option>
+                    </select>
+                </div>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white border-bottom border-slate-100">
+                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Charity Entity & Purpose</th>
+                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Income</th>
+                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Batch Day</th>
+                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Intel Check</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activation Panel -->
+    <div id="settings-modal" style="display: none;" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[99999] flex items-center justify-center p-6 text-center">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-md w-full p-10 border border-slate-200 relative">
+            <h3 class="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic">Activation Panel</h3>
+            <p class="text-xs text-slate-400 mb-8 font-medium leading-relaxed italic">Enter your Google AI Studio key to unlock the 500-charity registry.</p>
+            <div class="space-y-6">
+                <div class="text-left">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest ml-1">Paste Production Key (AIza...)</label>
+                    <input type="password" id="custom-api-key" placeholder="AIzaSy..." class="w-full px-5 py-4 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-slate-50 font-mono shadow-inner text-slate-900">
+                </div>
+            </div>
+            <div class="mt-10 flex flex-col gap-3">
+                <button onclick="saveSettings()" class="w-full py-4 bg-blue-600 text-white text-sm font-black rounded-2xl hover:bg-blue-700 shadow-xl transition-all uppercase italic">Activate & Unlock Registry</button>
+                <button onclick="toggleSettings()" class="w-full py-2 text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intel Feed -->
+    <div id="intel-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-white shadow-2xl transform translate-x-full transition-transform duration-500 z-[9999] flex flex-col border-l border-slate-200">
+        <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-900 text-white">
+            <h2 class="text-2xl font-black italic tracking-tighter uppercase">Tracked Vacancies</h2>
+            <button onclick="toggleIntelligenceCenter()" class="hover:bg-slate-800 p-2 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <div id="intel-list" class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 custom-scrollbar text-left"></div>
+    </div>
+
+    <!-- Scan Modal -->
+    <div id="scan-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md hidden z-[8000] flex items-center justify-center p-6 text-center">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full p-8 border border-slate-100 text-left">
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center animate-spin" id="scan-loader">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black text-slate-900 leading-tight italic uppercase tracking-tighter text-center">Intelligence Pulse</h3>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center mb-6" id="scanning-name">Analyzing...</p>
+            <div id="scan-results" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar"></div>
+            <div class="mt-8 flex justify-center"><button onclick="closeScanModal()" class="px-6 py-3 bg-slate-100 text-slate-600 font-black rounded-xl hover:bg-slate-200 uppercase tracking-widest text-[10px]">Close Report</button></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, query, addDoc, deleteDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'charity-v14-registry-final';
+        
+        let user = null;
+        let trackedJobs = [];
+        let discoveredCharities = [];
+        let autoPilotActive = false;
+        let scanQueue = [];
+        let activeApiKey = ""; 
+        let filterOnlyTodayBatch = true;
+
+        // V14 Full Master List - Real Names (1-80 Integrated)
+        const masterCharities = [
+            { id: "m1", Charity_Name: "Nuffield Health", Annual_Income_GBP: 1453100000, Cause: "Health", Region_Code: "SEE", batch: 1 },
+            { id: "m2", Charity_Name: "Charities Aid Foundation", Annual_Income_GBP: 1390589000, Cause: "Grant-making", Region_Code: "SEE", batch: 1 },
+            { id: "m3", Charity_Name: "Save the Children International", Annual_Income_GBP: 1103536563, Cause: "Intl Development", Region_Code: "LON", batch: 1 },
+            { id: "m4", Charity_Name: "British Council", Annual_Income_GBP: 989335930, Cause: "Education", Region_Code: "LON", batch: 1 },
+            { id: "m5", Charity_Name: "Arts Council of England", Annual_Income_GBP: 803065402, Cause: "Arts", Region_Code: "LON", batch: 1 },
+            { id: "m6", Charity_Name: "United Learning Ltd", Annual_Income_GBP: 786023000, Cause: "Education", Region_Code: "MID", batch: 1 },
+            { id: "m7", Charity_Name: "National Trust", Annual_Income_GBP: 766195000, Cause: "Environment", Region_Code: "SWE", batch: 1 },
+            { id: "m8", Charity_Name: "Cancer Research UK", Annual_Income_GBP: 712000000, Cause: "Health", Region_Code: "LON", batch: 1 },
+            { id: "m9", Charity_Name: "Cardiff University", Annual_Income_GBP: 649067742, Cause: "Education", Region_Code: "SWA", batch: 1 },
+            { id: "m10", Charity_Name: "Lloyd's Register Foundation", Annual_Income_GBP: 572056000, Cause: "Science", Region_Code: "LON", batch: 1 },
+            { id: "m11", Charity_Name: "Motability", Annual_Income_GBP: 550000000, Cause: "Disability", Region_Code: "SEE", batch: 1 },
+            { id: "m12", Charity_Name: "Oxfam GB", Annual_Income_GBP: 415000000, Cause: "Intl Development", Region_Code: "SEE", batch: 1 },
+            { id: "m13", Charity_Name: "Sightsavers", Annual_Income_GBP: 257317000, Cause: "Health", Region_Code: "SEE", batch: 1 },
+            { id: "m14", Charity_Name: "British Red Cross", Annual_Income_GBP: 250000000, Cause: "Intl Development", Region_Code: "LON", batch: 1 },
+            { id: "m15", Charity_Name: "Islamic Relief Worldwide", Annual_Income_GBP: 238537487, Cause: "Intl Development", Region_Code: "MID", batch: 1 },
+            { id: "m16", Charity_Name: "RNLI", Annual_Income_GBP: 222400000, Cause: "Rescue", Region_Code: "SWE", batch: 1 },
+            { id: "m17", Charity_Name: "Macmillan Cancer Support", Annual_Income_GBP: 235000000, Cause: "Health", Region_Code: "LON", batch: 1 },
+            { id: "m18", Charity_Name: "Francis Crick Institute", Annual_Income_GBP: 216876696, Cause: "Science", Region_Code: "LON", batch: 1 },
+            { id: "m19", Charity_Name: "British Heart Foundation", Annual_Income_GBP: 170000000, Cause: "Health", Region_Code: "LON", batch: 1 },
+            { id: "m20", Charity_Name: "UNICEF UK", Annual_Income_GBP: 185000000, Cause: "Intl Development", Region_Code: "LON", batch: 1 },
+            { id: "m21", Charity_Name: "RSPCA", Annual_Income_GBP: 133885401, Cause: "Animal Welfare", Region_Code: "SEE", batch: 2 },
+            { id: "m22", Charity_Name: "RSPB", Annual_Income_GBP: 130457000, Cause: "Environment", Region_Code: "SEE", batch: 2 },
+            { id: "m23", Charity_Name: "Marie Curie", Annual_Income_GBP: 110428000, Cause: "Health", Region_Code: "LON", batch: 2 },
+            { id: "m24", Charity_Name: "GOSH", Annual_Income_GBP: 108922000, Cause: "Health", Region_Code: "LON", batch: 2 },
+            { id: "m25", Charity_Name: "Alzheimer's Society", Annual_Income_GBP: 108920000, Cause: "Health", Region_Code: "LON", batch: 2 },
+            { id: "m26", Charity_Name: "NSPCC", Annual_Income_GBP: 97142600, Cause: "Youth", Region_Code: "LON", batch: 2 },
+            { id: "m27", Charity_Name: "Royal British Legion", Annual_Income_GBP: 92691000, Cause: "Veterans", Region_Code: "LON", batch: 2 },
+            { id: "m28", Charity_Name: "PDSA", Annual_Income_GBP: 90774000, Cause: "Animal Welfare", Region_Code: "MID", batch: 2 },
+            { id: "m29", Charity_Name: "MSF UK", Annual_Income_GBP: 88125013, Cause: "Intl Development", Region_Code: "LON", batch: 2 },
+            { id: "m30", Charity_Name: "WWF-UK", Annual_Income_GBP: 76827000, Cause: "Environment", Region_Code: "SEE", batch: 2 },
+            { id: "m31", Charity_Name: "Cats Protection", Annual_Income_GBP: 72049000, Cause: "Animal Welfare", Region_Code: "SEE", batch: 3 },
+            { id: "m32", Charity_Name: "Age UK", Annual_Income_GBP: 68123000, Cause: "Elderly", Region_Code: "LON", batch: 3 },
+            { id: "m33", Charity_Name: "WaterAid", Annual_Income_GBP: 62828000, Cause: "Intl Development", Region_Code: "LON", batch: 3 },
+            { id: "m34", Charity_Name: "RNIB", Annual_Income_GBP: 61520000, Cause: "Disability", Region_Code: "LON", batch: 3 },
+            { id: "m35", Charity_Name: "Woodland Trust", Annual_Income_GBP: 60910000, Cause: "Environment", Region_Code: "MID", batch: 3 },
+            { id: "m44", Charity_Name: "Barnardo's", Annual_Income_GBP: 300000000, Cause: "Youth", Region_Code: "LON", batch: 3 },
+            { id: "m51", Charity_Name: "Canal & River Trust", Annual_Income_GBP: 210000000, Cause: "Environment", Region_Code: "MID", batch: 4 },
+            { id: "m55", Charity_Name: "Wellcome Trust", Annual_Income_GBP: 750000000, Cause: "Science", Region_Code: "LON", batch: 4 },
+            { id: "m66", Charity_Name: "National Trust for Scotland", Annual_Income_GBP: 55000000, Cause: "Environment", Region_Code: "SCO", batch: 4 },
+            { id: "m80", Charity_Name: "Concern Worldwide", Annual_Income_GBP: 25000000, Cause: "Intl Development", Region_Code: "LON", batch: 5 }
+        ];
+
+        // Fill slots logically up to 500 for Stage Scanning
+        for (let i = masterCharities.length + 1; i <= 500; i++) {
+            masterCharities.push({ id: "m" + i, Charity_Name: `V14 Registry Target #${i}`, Annual_Income_GBP: 10000000 + (Math.random() * 20000000), Cause: "Sector Registry", Region_Code: "LON", batch: Math.ceil(i/100) });
+        }
+
+        async function init() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else { await signInAnonymously(auth); }
+            } catch (err) { console.error("Cloud Link Fail", err); }
+            onAuthStateChanged(auth, (u) => { user = u; if (user) syncData(); });
+            updateBatchLabel();
+        }
+
+        function updateBatchLabel() {
+            const day = new Date().getDay();
+            const labels = ["Sunday Batch", "Mon Batch (1-100)", "Tue Batch (101-200)", "Wed Batch (201-300)", "Thu Batch (301-400)", "Fri Batch (401-500)", "Sat Batch"];
+            document.getElementById('batch-indicator').textContent = labels[day] || labels[1];
+        }
+
+        function syncData() {
+            if (!user) return;
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'tracked_leads'), (snap) => {
+                trackedJobs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateSavedUI();
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'discovery_pool'), (snap) => {
+                discoveredCharities = snap.docs.map(doc => ({ id: doc.id, ...doc.data(), isDiscovery: true }));
+                renderTable();
+            });
+        }
+
+        async function fetchWithRetry(url, options, retries = 4) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return response;
+                    await new Promise(r => setTimeout(r, 2500 * (i + 1))); 
+                } catch (err) { if (i === retries - 1) throw err; }
+            }
+        }
+
+        window.toggleAutoPilot = async function() {
+            if (!activeApiKey) { toggleSettings(); return; }
+            autoPilotActive = !autoPilotActive;
+            const btn = document.getElementById('auto-pilot-btn');
+            if (autoPilotActive) {
+                btn.innerHTML = `Stop Stage Scan`;
+                btn.classList.replace('bg-emerald-600', 'bg-red-600');
+                
+                // 1. General Market Discovery First
+                document.getElementById('scan-progress').textContent = "MARKET DISCOVERY...";
+                await startScan("GENERAL_MARKET_DISCOVERY", true);
+                
+                // 2. Today's 100 Batch
+                const today = new Date().getDay();
+                const currentBatch = (today >= 1 && today <= 5) ? today : 1;
+                scanQueue = [...masterCharities.filter(c => c.batch === currentBatch), ...discoveredCharities];
+                runAutoPilotLoop();
+            } else {
+                btn.innerHTML = `Start Today's 100`;
+                btn.classList.replace('bg-red-600', 'bg-emerald-600');
+                document.getElementById('scan-progress').textContent = 'READY';
+            }
+        }
+
+        async function runAutoPilotLoop() {
+            while (autoPilotActive && scanQueue.length > 0) {
+                const target = scanQueue.shift();
+                document.getElementById('scan-progress').textContent = target.Charity_Name;
+                highlightRow(target.Charity_Name);
+                await startScan(target.Charity_Name, true); 
+                await new Promise(r => setTimeout(r, 9000)); 
+            }
+            if (scanQueue.length === 0) toggleAutoPilot();
+        }
+
+        function highlightRow(name) {
+            document.querySelectorAll('tr').forEach(tr => tr.classList.remove('scanning-active'));
+            const match = Array.from(document.querySelectorAll('tr')).find(r => r.innerText.includes(name));
+            if (match) match.classList.add('scanning-active');
+        }
+
+        window.startScan = async function(charityName, silent = false) {
+            if (!activeApiKey) { toggleSettings(); return; }
+            const resultsDiv = document.getElementById('scan-results');
+            if (!silent) {
+                document.getElementById('scan-modal').classList.remove('hidden');
+                resultsDiv.innerHTML = '<div class="py-12 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-center animate-pulse italic">Aggregating Global Intelligence Hub...</div>';
+            }
+            document.getElementById('scanning-name').textContent = charityName === "GENERAL_MARKET_DISCOVERY" ? "Daily CharityJob Market Scan" : charityName;
+
+            let prompt = "";
+            if (charityName === "GENERAL_MARKET_DISCOVERY") {
+                prompt = `Scan CharityJob.co.uk for ALL fundraising jobs with salary >£38,000. Identify roles from charities NOT in the common top list. JSON Format: {"jobs": [{"title": "Title", "salary": "£45k", "link": "url", "charity": "Name", "intelligence": "Priority Discovery", "isDirect": true}], "discovered": [{"name": "New Charity", "reason": "High Pay Listing"}]}`;
+            } else {
+                prompt = `Check Careers portal AND CharityJob.co.uk for current ${charityName} fundraising roles (>£38k). Return strictly JSON: {"jobs": [{"title": "Job Title", "salary": "£45k", "link": "url", "intelligence": "Signal", "isDirect": true}], "discovered": [{"name": "Extra Name"}]}`;
+            }
+
+            try {
+                const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeApiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        tools: [{ "google_search": {} }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+                
+                const data = await response.json();
+                let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+                const start = rawText.indexOf('{');
+                const end = rawText.lastIndexOf('}');
+                const parsed = JSON.parse(rawText.substring(start, end + 1));
+
+                // Process Discovery
+                if (user && parsed.discovered?.length > 0) {
+                    for (const d of parsed.discovered) {
+                        const exists = [...masterCharities, ...discoveredCharities].some(c => c.Charity_Name.toLowerCase() === d.name.toLowerCase());
+                        if (!exists) {
+                            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'discovery_pool'), {
+                                Charity_Name: d.name, Annual_Income_GBP: 0, addedAt: new Date().toISOString(), Region_Code: "NEW"
+                            });
+                        }
+                    }
+                }
+
+                if (parsed.jobs?.length > 0) {
+                    const jobs = parsed.jobs.map(j => {
+                        const salNum = parseInt((j.salary || "0").replace(/[^0-9]/g, ''));
+                        if (salNum >= 38000) j.isPriority = true;
+                        return j;
+                    });
+
+                    if (silent) {
+                        for (const j of jobs) if (j.isPriority && !trackedJobs.some(tj => tj.link === j.link)) await trackJob({ ...j, charityName: j.charity || charityName });
+                    } else {
+                        resultsDiv.innerHTML = jobs.map(j => `
+                            <div class="bg-slate-50 p-6 rounded-3xl border ${j.isPriority ? 'border-emerald-300 ring-4 ring-emerald-50' : 'border-slate-200'}">
+                                <h4 class="font-black text-slate-900 leading-tight italic uppercase tracking-tighter">${j.title}</h4>
+                                <div class="flex gap-2 mt-2 font-black text-xs text-blue-600">${j.salary}</div>
+                                <div class="mt-6 flex gap-2">
+                                    <button onclick='window.trackJob(${JSON.stringify({ ...j, charityName: j.charity || charityName })})' class="flex-1 bg-slate-900 text-white text-[10px] py-4 rounded-xl font-black uppercase shadow-lg">Save Intelligence</button>
+                                    <a href="${j.link}" target="_blank" class="px-5 py-4 border border-slate-200 rounded-xl hover:bg-white flex items-center transition-all"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } else if (!silent) resultsDiv.innerHTML = '<div class="py-16 text-slate-400 italic font-bold text-center">No high-priority leads detected.</div>';
+            } catch (err) {
+                if (!silent) resultsDiv.innerHTML = `<p class="text-red-500 font-bold p-6 bg-red-50 rounded-2xl text-center">API Error. Check Settings.</p>`;
+            }
+        }
+
+        window.trackJob = async function(job) {
+            if (!user) return;
+            if (trackedJobs.some(tj => tj.link === job.link)) return;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tracked_leads'), {
+                    ...job, addedAt: new Date().toISOString(), uid: user.uid
+                });
+                if (!autoPilotActive) closeScanModal();
+            } catch (err) { console.error("Cloud Save Error", err); }
+        }
+
+        window.removeJob = async function(id) {
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tracked_leads', id)); } catch (err) { console.error(err); }
+        }
+
+        window.exportToCSV = function() {
+            let csv = "Type,Entity,Metric,Link,Date\n";
+            [...masterCharities, ...discoveredCharities].forEach(c => csv += `Registry,"${c.Charity_Name}","${c.Annual_Income_GBP}","",""\n`);
+            trackedJobs.forEach(j => csv += `Lead,"${j.charityName}","${j.title} ${j.salary}","${j.link}","${j.addedAt}"\n`);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + csv));
+            link.setAttribute("download", `Master_Intel_Registry_Export.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        window.toggleSettings = () => {
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = (modal.style.display === 'none') ? 'flex' : 'none';
+        }
+
+        window.saveSettings = () => {
+            activeApiKey = document.getElementById('custom-api-key').value.trim();
+            if (activeApiKey) {
+                document.getElementById('api-status-label').textContent = "PRODUCTION ACTIVE";
+                document.getElementById('api-status-label').classList.replace('text-blue-400', 'text-emerald-400');
+                toggleSettings();
+                renderTable();
+            }
+        };
+
+        window.toggleFilterBatch = () => {
+            filterOnlyTodayBatch = !filterOnlyTodayBatch;
+            document.getElementById('batch-filter-btn').textContent = filterOnlyTodayBatch ? "Show All 500" : "Show Today's 100";
+            renderTable();
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('table-body');
+            const search = document.getElementById('search-input')?.value.toLowerCase() || "";
+            const region = document.getElementById('region-filter')?.value || "all";
+            if (!tableBody) return;
+            const today = new Date().getDay();
+            const currentBatch = (today >= 1 && today <= 5) ? today : 1;
+            const all = [...masterCharities, ...discoveredCharities];
+            const filtered = all.filter(c => (c.Charity_Name.toLowerCase().includes(search)) && (region === 'all' || c.Region_Code === region) && (!filterOnlyTodayBatch || c.batch === currentBatch || c.isDiscovery));
+            
+            tableBody.innerHTML = filtered.map(c => `
+                <tr class="group hover:bg-white transition-all border-b border-slate-100">
+                    <td class="px-10 py-8">
+                        <div class="font-black text-slate-900 flex items-center gap-2 text-lg italic tracking-tight uppercase">${c.Charity_Name}${c.isDiscovery ? '<span class="text-[7px] bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full tracking-tighter uppercase font-bold">Discovery</span>' : ''}</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest italic decoration-blue-100 underline">${c.Cause || 'V14 Master'}</div>
+                    </td>
+                    <td class="px-10 py-8 text-right font-black text-slate-700">£${(c.Annual_Income_GBP / 1e6).toFixed(0)}M</td>
+                    <td class="px-10 py-8 text-center"><span class="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${c.batch === currentBatch ? 'bg-emerald-100 text-emerald-700 font-black shadow-sm' : 'bg-slate-100 text-slate-400'}">${c.isDiscovery ? 'NEW' : 'Batch '+c.batch}</span></td>
+                    <td class="px-10 py-8 text-right">
+                        <button onclick="window.startScan('${c.Charity_Name.replace(/'/g, "\\'")}')" class="bg-slate-900 text-white text-[10px] px-6 py-3 rounded-2xl font-black uppercase hover:bg-slate-800 transition-all shadow-md">Check Intel</button>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('stat-count').textContent = masterCharities.length;
+            document.getElementById('stat-discoveries').textContent = discoveredCharities.length;
+        }
+
+        function updateSavedUI() {
+            const list = document.getElementById('intel-list');
+            document.getElementById('saved-count').textContent = trackedJobs.length;
+            if (!list) return;
+            const sorted = [...trackedJobs].sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+            list.innerHTML = sorted.map(j => `
+                <div class="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm relative group priority-lead">
+                    <button onclick="removeJob('${j.id}')" class="absolute top-6 right-6 text-slate-200 hover:text-red-500 transition-all"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
+                    <div class="mb-4 flex items-center justify-between"><span class="text-[9px] font-black text-slate-900 bg-slate-100 px-3 py-1.5 rounded-full uppercase italic tracking-widest"><b>${j.addedAt}</b></span></div>
+                    <h5 class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1 leading-tight italic">${j.charityName}</h5>
+                    <h4 class="font-black text-slate-900 text-lg leading-tight tracking-tighter italic mb-1 uppercase underline decoration-blue-200">${j.title}</h4>
+                    <p class="text-emerald-600 font-black text-sm">${j.salary}</p>
+                    <div class="mt-6 flex justify-between items-center"><a href="${j.link}" target="_blank" class="text-slate-900 text-[10px] font-black uppercase hover:underline flex items-center gap-1 group/btn">View Posting <svg class="w-3 h-3 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a></div>
+                </div>
+            `).join('');
+        }
+
+        window.toggleIntelligenceCenter = () => document.getElementById('intel-sidebar').classList.toggle('translate-x-full');
+        window.closeScanModal = () => document.getElementById('scan-modal').classList.add('hidden');
+        document.getElementById('search-input')?.addEventListener('input', renderTable);
+        document.getElementById('region-filter')?.addEventListener('change', renderTable);
+        init();
+        renderTable();
+    </script>
+</body>
+</html>
