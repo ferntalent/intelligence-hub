@@ -28,7 +28,7 @@
                     Intelligence Hub
                     <span class="text-xs font-bold px-3 py-1 bg-blue-600 text-white rounded-full tracking-widest not-italic shadow-sm normal-case tracking-normal">V15 ENTERPRISE</span>
                 </h1>
-                <p class="text-slate-500 mt-2 font-medium">Auto-Discovery Engine • 9-Month History Guard • Cloud Sync enabled</p>
+                <p class="text-slate-500 mt-2 font-medium italic underline decoration-blue-100">9-Month History Guard • Tenure Analytics • Enterprise Cloud Ready</p>
             </div>
             
             <div class="flex flex-wrap gap-3">
@@ -41,11 +41,11 @@
                 </button>
                 <label class="cursor-pointer bg-white text-slate-700 px-6 py-3 rounded-2xl shadow-sm border border-slate-200 hover:bg-slate-50 transition-all font-bold text-sm flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    Import CSV
+                    Import 5k Registry
                     <input type="file" id="csv-upload" class="hidden" accept=".csv">
                 </label>
                 <button id="auto-pilot-btn" onclick="toggleAutoPilot()" class="bg-emerald-600 text-white px-8 py-3 rounded-2xl shadow-lg hover:bg-emerald-700 transition-all flex items-center gap-2 font-black uppercase tracking-tighter text-sm italic">
-                    Start Scan Batch
+                    Start Scanning Batch
                 </button>
             </div>
         </div>
@@ -57,26 +57,25 @@
                 <div class="text-3xl font-black text-slate-900 mt-1" id="stat-total">0</div>
             </div>
             <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-blue-600 cursor-pointer hover:bg-blue-50 transition-all" onclick="toggleSavedSidebar()">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Historical Records</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cloud History</span>
                 <div class="text-3xl font-black mt-1" id="stat-saved">0</div>
             </div>
             <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-red-600">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest underline decoration-red-300">Urgent Hits</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest underline decoration-red-300">Urgent ( < 9mo )</span>
                 <div class="text-3xl font-black mt-1" id="stat-urgent">0</div>
             </div>
             <div class="bg-slate-900 p-6 rounded-3xl shadow-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Live Action</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Pipeline Status</span>
                 <div class="text-sm font-black text-emerald-400 truncate px-2 mt-1 italic uppercase" id="scan-progress">READY</div>
             </div>
         </div>
 
-        <!-- Main Table -->
-        <div class="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden">
+        <!-- Main Registry -->
+        <div class="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden mb-10">
             <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/50">
-                <input type="text" id="search-input" oninput="renderTable()" placeholder="Search registry..." class="flex-1 max-w-md bg-white px-6 py-3 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium shadow-sm">
+                <input type="text" id="search-input" oninput="renderTable()" placeholder="Search registry targets..." class="flex-1 max-w-md bg-white px-6 py-3 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium shadow-sm">
                 <div class="flex items-center gap-3">
-                    <button onclick="exportUpdatedRegistry()" class="bg-white border border-slate-200 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-blue-600 hover:bg-blue-50 transition-all shadow-sm">Export Registry</button>
-                    <button onclick="toggleFilterFundraising()" id="fundraising-filter-btn" class="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Targets Only</button>
+                    <button onclick="toggleFilterFundraising()" id="fundraising-filter-btn" class="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-sm">Targets Only</button>
                     <button onclick="toggleFilterBatch()" id="batch-filter-btn" class="bg-white border border-slate-200 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-slate-600">Today's Batch</button>
                 </div>
             </div>
@@ -84,7 +83,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-white border-b border-slate-100">
-                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Organization</th>
+                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Charity Organization</th>
                             <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Income</th>
                             <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Batch</th>
                             <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
@@ -94,15 +93,26 @@
                 </table>
             </div>
         </div>
+
+        <!-- System Log -->
+        <div class="bg-slate-900 rounded-3xl p-6 text-slate-400 font-mono text-[10px] leading-relaxed mb-10">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-blue-400 font-bold uppercase tracking-widest">System Diagnostics</span>
+                <span class="text-slate-600">v15.2.0-STABLE</span>
+            </div>
+            <div id="system-log" class="max-h-32 overflow-y-auto custom-scrollbar">
+                <div>[SYSTEM] Initializing Intelligence Core...</div>
+            </div>
+        </div>
     </div>
 
     <!-- Activation Overlay -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden flex items-center justify-center p-6 z-[10000]">
         <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-md w-full p-10 border border-slate-100 text-center">
-            <h3 class="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center">Enterprise Activation</h3>
+            <h3 class="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic">Enterprise Activation</h3>
             <p class="text-xs text-slate-400 mb-8 font-medium italic leading-relaxed text-center">Enter Gemini API key to activate historical tracking and scanning engine.</p>
             <div class="space-y-6 text-left">
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest text-center">Paste Production Key (AIza...)</label>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest ml-1 text-center">Paste Production Key (AIza...)</label>
                 <input type="password" id="custom-api-key" placeholder="AIzaSy..." class="w-full px-5 py-4 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-slate-50 font-mono shadow-inner text-slate-900">
             </div>
             <div class="mt-10 flex flex-col gap-3">
@@ -118,12 +128,9 @@
             <h2 class="text-2xl font-black italic tracking-tighter uppercase">Cloud History</h2>
             <button onclick="toggleSavedSidebar()" class="hover:bg-slate-800 p-2 rounded-full transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
-        <div class="p-4 bg-blue-50 border-b border-blue-100 text-[10px] font-bold text-blue-800 uppercase text-center tracking-widest">
-            Cross-referencing all leads from the last 270 days
-        </div>
         <div id="intel-list" class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 custom-scrollbar text-left"></div>
         <div class="p-6 border-t border-slate-200 bg-white">
-            <button onclick="exportHistoryCSV()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-[10px] uppercase hover:bg-slate-200 shadow-sm">Export All History</button>
+            <button onclick="exportHistoryCSV()" class="w-full py-3 bg-slate-100 text-slate-600 font-black rounded-xl text-[10px] uppercase hover:bg-slate-200 shadow-sm">Export History</button>
         </div>
     </div>
 
@@ -132,7 +139,7 @@
         <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-xl w-full p-10 border border-slate-100 text-left relative">
             <div class="flex items-center justify-center gap-4 mb-6 text-center">
                 <div id="scan-loader" class="w-10 h-10 border-4 border-slate-100 loader rounded-full"></div>
-                <h3 class="text-2xl font-black text-slate-900 leading-tight uppercase italic tracking-tighter">AI Pulse Discovery</h3>
+                <h3 class="text-2xl font-black text-slate-900 leading-tight uppercase italic tracking-tighter">AI Discovery Report</h3>
             </div>
             <p id="scanning-name" class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center mb-6">Analyzing Target...</p>
             <div id="scan-results" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar"></div>
@@ -141,14 +148,17 @@
     </div>
 
     <script>
-        function toggleSettings() {
-            document.getElementById('settings-modal').classList.toggle('hidden');
-        }
-        function closeScanModal() {
-            document.getElementById('scan-modal').classList.add('hidden');
-        }
-        function toggleSavedSidebar() {
-            document.getElementById('intel-sidebar').classList.toggle('translate-x-full');
+        // Global UI Toggles
+        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
+        function closeScanModal() { document.getElementById('scan-modal').classList.add('hidden'); }
+        function toggleSavedSidebar() { document.getElementById('intel-sidebar').classList.toggle('translate-x-full'); }
+        
+        function logToSystem(msg) {
+            const container = document.getElementById('system-log');
+            if (!container) return;
+            const entry = document.createElement('div');
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            container.prepend(entry);
         }
     </script>
 
@@ -158,114 +168,131 @@
         import { getFirestore, collection, doc, setDoc, onSnapshot, query, addDoc, deleteDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // APP CONFIG
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'charity-v15-ent-final-discovery';
+        let firebaseConfig = {};
+        try { firebaseConfig = JSON.parse(__firebase_config); } catch (e) { logToSystem("Running in Local Sandbox Mode."); }
         
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'charity-v15-enterprise-production';
+        
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) { logToSystem("Database connection skipped."); }
 
         let user = null;
         let masterRegistry = [];
         let trackedJobs = [];
-        let activeApiKey = ""; 
+        let activeApiKey = localStorage.getItem('intel_hub_api_key') || ""; 
         let autoPilotActive = false;
         let scanQueue = [];
         let filterOnlyTodayBatch = false;
         let filterOnlyHighSuitability = true;
 
+        // PRE-LOADED STARTER REGISTRY (From Charity Commission Top List)
+        const starterRegistry = [
+            { name: "Nuffield Health", income: 1453100000, suitability: true, batch: 1 },
+            { name: "Charities Aid Foundation", income: 1390589000, suitability: true, batch: 1 },
+            { name: "Save the Children International", income: 1103536563, suitability: true, batch: 1 },
+            { name: "British Council", income: 989335930, suitability: true, batch: 1 },
+            { name: "National Trust", income: 766195000, suitability: true, batch: 1 },
+            { name: "Cancer Research UK", income: 712000000, suitability: true, batch: 2 },
+            { name: "Oxfam GB", income: 415000000, suitability: true, batch: 2 },
+            { name: "British Red Cross", income: 250000000, suitability: true, batch: 2 },
+            { name: "Marie Curie", income: 110428000, suitability: true, batch: 3 },
+            { name: "Alzheimer's Society", income: 108920000, suitability: true, batch: 3 }
+        ];
+
         // 1. SYSTEM INITIALIZATION
         async function init() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (e) { console.error("Auth failed:", e); }
+            if (activeApiKey) {
+                const statusLabel = document.getElementById('api-status-label');
+                statusLabel.textContent = "SYSTEM ACTIVE";
+                statusLabel.parentElement.classList.replace('bg-slate-900', 'bg-emerald-600');
+            }
 
-            onAuthStateChanged(auth, (u) => {
-                user = u;
-                if (user) { syncCloudData(); }
-            });
+            if (auth) {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    onAuthStateChanged(auth, (u) => {
+                        user = u;
+                        if (user) { 
+                            logToSystem("Cloud Authentication Successful.");
+                            syncCloudData(); 
+                        }
+                    });
+                } catch (e) { logToSystem("Auth Error: Working in Local Session."); }
+            }
 
+            masterRegistry = starterRegistry;
             updatePipelineLabel();
             renderTable();
+            logToSystem("Ready. Total Targets: " + masterRegistry.length);
         }
 
-        // 2. DATA SYNC (Leads + Target Registry)
+        // 2. DATA SYNC
         function syncCloudData() {
-            if (!user) return;
-            
-            // Sync Leads History
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'leads'), (snap) => {
+            if (!user || !db) return;
+            const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+            onSnapshot(leadsRef, (snap) => {
                 trackedJobs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 updateMetricsUI();
                 renderSavedHits();
-            });
-
-            // Sync Registry (Persistent Targets)
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'registry'), (snap) => {
-                masterRegistry = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const statTotal = document.getElementById('stat-total');
-                if (statTotal) statTotal.textContent = masterRegistry.length;
-                renderTable();
-            });
+                logToSystem("History Synced. Total Records: " + trackedJobs.length);
+            }, (err) => logToSystem("Snapshot Permission Delayed. Refresh recommended."));
         }
 
-        // 3. CSV PROCESSING & BATCH PERSISTENCE
+        // 3. CSV PROCESSING
         document.getElementById('csv-upload').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if (!file || !user) return;
-
-            document.getElementById('scan-progress').textContent = "INGESTING CLOUD REGISTRY...";
+            if (!file) return;
+            logToSystem("Reading CSV File...");
 
             Papa.parse(file, {
                 header: true,
                 skipEmptyLines: true,
                 complete: async function(results) {
-                    const processed = results.data.map((row, index) => {
-                        const name = (row['Charity Name'] || "").trim();
-                        const incomeStr = row['Last Recorded Income'] || "0";
+                    const data = results.data;
+                    logToSystem(`Parsed ${data.length} rows. Analyzing suitability...`);
+
+                    const processed = data.map((row, index) => {
+                        // Header mapping support for various CSV formats
+                        const name = (row['Charity Name'] || row['Charity_Name'] || row['Organisation'] || "").trim();
+                        const incomeStr = row['Last Recorded Income'] || row['Income'] || "0";
                         const income = parseInt(incomeStr.replace(/[^0-9]/g, '')) || 0;
-                        const helps = (row['How the charity helps'] || "").toLowerCase();
+                        const helps = (row['How the charity helps'] || row['Activities'] || "").toLowerCase();
 
                         let suitability = true;
                         if (income < 1500000) suitability = false;
                         if (helps.includes("makes grants") && !helps.includes("provides")) suitability = false;
-                        if (name.includes("PENSION") || name.includes("BOARD OF")) suitability = false;
+                        if (name.toUpperCase().includes("PENSION") || name.toUpperCase().includes("BOARD OF")) suitability = false;
 
-                        return { name, income, suitability, batch: (index % 10) + 1, source: 'CSV Import' };
+                        return { name, income, suitability, batch: (index % 10) + 1 };
                     }).filter(c => c.name);
 
-                    // SAVE TO CLOUD IN BATCHES
-                    const registryRef = collection(db, 'artifacts', appId, 'public', 'data', 'registry');
-                    for (let i = 0; i < Math.min(processed.length, 500); i += 100) {
-                        const batch = writeBatch(db);
-                        processed.slice(i, i + 100).forEach((item, subIdx) => {
-                            const docRef = doc(registryRef, `target-${i + subIdx}`);
-                            batch.set(docRef, item);
-                        });
-                        await batch.commit();
-                    }
-
-                    document.getElementById('scan-progress').textContent = "CLOUD SYNC COMPLETE";
-                    setTimeout(() => document.getElementById('scan-progress').textContent = "READY", 2000);
+                    masterRegistry = processed;
+                    document.getElementById('stat-total').textContent = masterRegistry.length;
+                    renderTable();
+                    logToSystem(`Import Successful: ${processed.length} valid targets found.`);
                 }
             });
         });
 
-        // 4. INTELLIGENCE ENGINE (Discovery + Historical Guard)
+        // 4. AI SCANNER
         window.startScan = async function(charityName, silent = false) {
             if (!activeApiKey) { toggleSettings(); return; }
             const resultsDiv = document.getElementById('scan-results');
             if (!silent) {
                 document.getElementById('scan-modal').classList.remove('hidden');
-                resultsDiv.innerHTML = '<div class="py-12 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-center animate-pulse italic">Connecting to Discovery Core...</div>';
+                resultsDiv.innerHTML = '<div class="py-12 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-center animate-pulse italic">Connecting to Gemini Production...</div>';
             }
             document.getElementById('scanning-name').textContent = charityName;
 
-            const prompt = `Identify fundraising vacancies for ${charityName} (>£38k) using official site and CharityJob.co.uk. Return strictly JSON: {"jobs": [{"title": "Role Name", "salary": "£45k", "link": "url", "hiringCharity": "Full Charity Name"}]}`;
+            const prompt = `Identify fundraising vacancies for ${charityName} (>£38k) using official site and CharityJob.co.uk. Return JSON: {"jobs": [{"title": "Role Name", "salary": "£45,000", "link": "url"}]}`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeApiKey}`, {
@@ -275,8 +302,6 @@
                 });
                 
                 const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
-
                 let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
                 rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
                 const parsed = JSON.parse(rawText);
@@ -284,19 +309,8 @@
                 if (parsed.jobs && parsed.jobs.length > 0) {
                     const hits = parsed.jobs.map(j => {
                         const now = new Date();
-                        const nineMonthsMs = 270 * 24 * 60 * 60 * 1000;
-                        
-                        // NEW DISCOVERY REGISTRATION
-                        const hiringCharity = j.hiringCharity || charityName;
-                        const existsInRegistry = masterRegistry.some(r => r.name.toLowerCase() === hiringCharity.toLowerCase());
-                        
-                        if (!existsInRegistry && user) {
-                            window.registerNewDiscovery(hiringCharity);
-                        }
-
-                        // HISTORICAL GUARD
                         const history = trackedJobs.filter(prev => 
-                            prev.charityName.toLowerCase() === hiringCharity.toLowerCase() &&
+                            prev.charityName.toLowerCase() === charityName.toLowerCase() &&
                             prev.title.toLowerCase().includes(j.title.toLowerCase())
                         ).sort((a,b) => new Date(b.foundAt) - new Date(a.foundAt));
 
@@ -306,15 +320,13 @@
                         if (history.length > 0) {
                             const lastFound = new Date(history[0].foundAt);
                             const timeDiff = now - lastFound;
-                            if (timeDiff < nineMonthsMs) {
-                                isUrgentReadv = true;
-                            } else {
+                            if (timeDiff < (270 * 24 * 60 * 60 * 1000)) isUrgentReadv = true;
+                            else {
                                 const months = Math.round(timeDiff / (30 * 24 * 60 * 60 * 1000));
-                                lastSeenLabel = `Last filled for ${months} months`;
+                                lastSeenLabel = `Last seen ${months} months ago`;
                             }
                         }
-
-                        return { ...j, isUrgentReadv, lastSeenLabel, charityName: hiringCharity, foundAt: now.toISOString() };
+                        return { ...j, isUrgentReadv, lastSeenLabel, charityName, foundAt: now.toISOString() };
                     });
 
                     if (silent) {
@@ -322,55 +334,41 @@
                     } else {
                         resultsDiv.innerHTML = hits.map(h => `
                             <div class="bg-white p-6 rounded-3xl border-2 ${h.isUrgentReadv ? 'readvertised-urgent' : (h.lastSeenLabel ? 'readvertised-history' : 'border-slate-100')} shadow-sm relative overflow-hidden">
-                                ${h.isUrgentReadv ? '<span class="absolute top-0 right-0 bg-red-600 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl tracking-widest uppercase italic">⚠️ RE-ADVERTISED (9mo)</span>' : ''}
-                                ${h.lastSeenLabel && !h.isUrgentReadv ? '<span class="absolute top-0 right-0 bg-blue-600 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl tracking-widest uppercase italic">Historical discovery</span>' : ''}
+                                ${h.isUrgentReadv ? '<span class="absolute top-0 right-0 bg-red-600 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl tracking-widest uppercase">⚠️ RE-ADVERTISED ( < 9mo)</span>' : ''}
                                 <h4 class="font-black text-slate-900 leading-tight italic uppercase text-lg">${h.title}</h4>
                                 <div class="text-blue-600 font-bold text-sm mt-1">${h.salary}</div>
                                 ${h.lastSeenLabel ? `<p class="mt-2 text-[9px] font-bold text-slate-500 italic">${h.lastSeenLabel}</p>` : ''}
                                 <div class="mt-6 flex gap-2">
-                                    <button onclick='window.saveLead(${JSON.stringify(h)})' class="flex-1 bg-slate-900 text-white py-3 rounded-xl text-[10px] font-black uppercase shadow-lg hover:bg-slate-800 transition-all">Save Event</button>
-                                    <a href="${h.link}" target="_blank" class="px-5 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center transition-all"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>
+                                    <button onclick='window.saveLead(${JSON.stringify(h)})' class="flex-1 bg-slate-900 text-white py-3 rounded-xl text-[10px] font-black uppercase shadow-lg">Save Event</button>
+                                    <a href="${h.link}" target="_blank" class="px-5 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>
                                 </div>
                             </div>
                         `).join('');
                     }
-                } else if (!silent) {
-                    resultsDiv.innerHTML = '<div class="py-16 text-center text-slate-400 font-bold italic uppercase tracking-widest text-[10px]">No active vacancies found.</div>';
-                }
-            } catch (err) {
-                if (!silent) resultsDiv.innerHTML = `<div class="bg-red-50 p-6 rounded-3xl text-red-600 font-bold text-center">API LIMIT OR ERROR: ${err.message}</div>`;
-            }
+                } else if (!silent) resultsDiv.innerHTML = '<div class="py-16 text-center text-slate-400 font-bold uppercase text-[10px]">No active roles detected.</div>';
+            } catch (err) { logToSystem("Scan Error: Check API Key settings."); }
         };
 
-        // 5. REGISTRY MANAGEMENT (Registering New Charities Found in Scans)
-        window.registerNewDiscovery = async function(charityName) {
-            const registryRef = collection(db, 'artifacts', appId, 'public', 'data', 'registry');
-            const newDocId = `discovery-${charityName.replace(/\W/g, '')}`;
-            await setDoc(doc(registryRef, newDocId), {
-                name: charityName,
-                income: 0,
-                suitability: true,
-                batch: 1, // Add to earliest batch for verification
-                source: 'AI Discovery',
-                foundAt: new Date().toISOString()
-            });
-        };
-
+        // 5. DATABASE OPERATIONS
         window.saveLead = async function(job) {
-            if (!user) return;
             if (trackedJobs.some(tj => tj.link === job.link)) return;
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'leads'), job);
-            } catch (e) { console.error("Cloud Save Fail:", e); }
+            if (user && db) {
+                try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'leads'), job); } catch (e) { console.error(e); }
+            } else {
+                trackedJobs.unshift(job);
+                updateMetricsUI();
+                renderSavedHits();
+            }
             if (!autoPilotActive) closeScanModal();
         };
 
         window.deleteLead = async function(id) {
-            if (!user || !db) return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'leads', id)); } catch (e) { console.error(e); }
+            if (user && db) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'leads', id)); } catch (e) { console.error(e); }
+            }
         };
 
-        // 6. UI ACTIONS & EXPORTS
+        // 6. UI ACTIONS
         window.toggleAutoPilot = async function() {
             if (!activeApiKey) { toggleSettings(); return; }
             autoPilotActive = !autoPilotActive;
@@ -382,7 +380,7 @@
                 scanQueue = masterRegistry.filter(c => c.batch === today && (!filterOnlyHighSuitability || c.suitability));
                 runAutoPilotLoop();
             } else {
-                btn.innerHTML = `Start Daily Scan`;
+                btn.innerHTML = `Start Batch`;
                 btn.classList.replace('bg-red-600', 'bg-emerald-600');
                 document.getElementById('scan-progress').textContent = 'READY';
             }
@@ -392,7 +390,7 @@
             while (autoPilotActive && scanQueue.length > 0) {
                 const target = scanQueue.shift();
                 document.getElementById('scan-progress').textContent = target.name;
-                const row = document.getElementById(`row-${target.id}`);
+                const row = document.getElementById(`row-${target.name.replace(/\W/g, '')}`);
                 if (row) {
                     row.classList.add('scanning-active');
                     row.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -409,22 +407,17 @@
             if (!tbody) return;
             const search = (document.getElementById('search-input')?.value || "").toLowerCase();
             const today = new Date().getDay() || 1;
-            
             const filtered = masterRegistry.filter(c => {
                 const matchesSearch = c.name.toLowerCase().includes(search);
                 const matchesBatch = !filterOnlyTodayBatch || c.batch === today;
                 const matchesSuitability = !filterOnlyHighSuitability || c.suitability;
                 return matchesSearch && matchesBatch && matchesSuitability;
             });
-            
             tbody.innerHTML = filtered.slice(0, 100).map(c => `
-                <tr id="row-${c.id}" class="hover:bg-white border-b border-slate-50 transition-all">
+                <tr id="row-${c.name.replace(/\W/g, '')}" class="hover:bg-white border-b border-slate-50 transition-all">
                     <td class="px-10 py-6">
-                        <div class="font-black uppercase italic text-lg tracking-tighter text-slate-800 flex items-center gap-2">
-                            ${c.name}
-                            ${c.source === 'AI Discovery' ? '<span class="text-[7px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full shadow-sm not-italic font-bold">✨ AI Discovery</span>' : ''}
-                        </div>
-                        ${c.suitability ? '<span class="text-[8px] font-black text-blue-500 bg-blue-50 px-2 py-0.5 rounded tracking-widest uppercase">Targeted High-Suitability</span>' : '<span class="text-[8px] font-black text-slate-300 uppercase tracking-widest">Low Potential Group</span>'}
+                        <div class="font-black uppercase italic text-lg tracking-tighter text-slate-800">${c.name}</div>
+                        ${c.suitability ? '<span class="text-[8px] font-black text-blue-500 bg-blue-50 px-2 py-0.5 rounded tracking-widest uppercase">Targeted High-Suitability</span>' : '<span class="text-[8px] font-black text-slate-300 uppercase tracking-widest">Low Potential</span>'}
                     </td>
                     <td class="px-10 py-6 text-right font-bold text-slate-500 italic">£${(c.income/1e6).toFixed(1)}M</td>
                     <td class="px-10 py-6 text-center">
@@ -433,7 +426,7 @@
                         </span>
                     </td>
                     <td class="px-10 py-6 text-right">
-                        <button onclick="window.startScan('${c.name.replace(/'/g, "\\'")}')" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-slate-800 shadow-md">Check Intel</button>
+                        <button onclick="window.startScan('${c.name.replace(/'/g, "\\'")}')" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-slate-800 shadow-md">Check</button>
                     </td>
                 </tr>
             `).join('');
@@ -443,27 +436,29 @@
             const list = document.getElementById('intel-list');
             if (!list) return;
             if (trackedJobs.length === 0) {
-                list.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold italic uppercase tracking-widest text-xs">No cloud database entries</div>';
+                list.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold italic uppercase text-[10px]">No findings in database</div>';
                 return;
             }
             list.innerHTML = trackedJobs.sort((a,b) => new Date(b.foundAt) - new Date(a.foundAt)).map(j => `
-                <div class="bg-white p-6 rounded-[2rem] border ${j.isUrgentReadv ? 'readvertised-urgent' : (j.lastSeenLabel ? 'readvertised-history' : 'border-slate-100')} shadow-sm relative group">
-                    <button onclick="window.deleteLead('${j.id}')" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
-                    <div class="mb-2 flex justify-between items-center"><span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">${j.charityName}</span> <span class="text-[7px] font-black text-slate-300">${new Date(j.foundAt).toLocaleDateString()}</span></div>
+                <div class="bg-white p-6 rounded-[2rem] border ${j.isUrgentReadv ? 'readvertised-urgent' : 'border-slate-100'} shadow-sm relative group">
+                    <button onclick="window.deleteLead('${j.id}')" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
+                    <div class="mb-2"><span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">${j.charityName}</span></div>
                     <h4 class="font-black text-slate-900 leading-tight italic uppercase text-sm underline decoration-blue-200">${j.title}</h4>
                     <p class="text-emerald-600 font-black text-xs mt-1">${j.salary}</p>
-                    <div class="mt-4 flex justify-between items-center">
-                        <a href="${j.link}" target="_blank" class="text-[8px] font-black uppercase text-slate-900 underline decoration-blue-200">View Active Posting</a>
+                    <div class="mt-4 flex justify-between items-center text-[8px] font-black uppercase text-slate-400">
+                        <a href="${j.link}" target="_blank" class="text-slate-900 underline">View</a>
+                        <span>${new Date(j.foundAt).toLocaleDateString()}</span>
                     </div>
                 </div>
             `).join('');
         };
 
         function updateMetricsUI() {
+            const urgentCount = trackedJobs.filter(j => j.isUrgentReadv).length;
             const statSaved = document.getElementById('stat-saved');
             const statUrgent = document.getElementById('stat-urgent');
             if (statSaved) statSaved.textContent = trackedJobs.length;
-            if (statUrgent) statUrgent.textContent = trackedJobs.filter(j => j.isUrgentReadv).length;
+            if (statUrgent) statUrgent.textContent = urgentCount;
         }
 
         function updatePipelineLabel() {
@@ -477,12 +472,14 @@
             const val = document.getElementById('custom-api-key').value.trim();
             if (val) {
                 activeApiKey = val;
+                localStorage.setItem('intel_hub_api_key', val);
                 const statusLabel = document.getElementById('api-status-label');
                 if (statusLabel) {
                     statusLabel.textContent = "SYSTEM ACTIVE";
                     statusLabel.parentElement.classList.replace('bg-slate-900', 'bg-emerald-600');
                 }
                 toggleSettings();
+                logToSystem("API Key Saved & Accepted.");
             }
         };
 
@@ -492,4 +489,15 @@
         window.exportHistoryCSV = function() {
             if (trackedJobs.length === 0) return;
             let csv = "Charity,Title,Salary,Link,DateFound,IsUrgentReadvertised\n";
-            trackedJobs.forEach(j => csv += `"${
+            trackedJobs.forEach(j => csv += `"${j.charityName}","${j.title}","${j.salary}","${j.link}","${j.foundAt}",${j.isUrgentReadv}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', ''); a.setAttribute('href', url); a.setAttribute('download', 'Charity_Recruitment_History.csv');
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        };
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
