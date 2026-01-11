@@ -3,38 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V18.3 - Strategic Pro</title>
+    <title>Intelligence Hub V18.7 - Enterprise Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; overflow-x: hidden; text-align: left; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .scanning-active { border-left: 8px solid #db2777 !important; background-color: #fff1f2 !important; transition: all 0.3s ease; }
         .urgency-badge { @apply px-2 py-0.5 rounded-full text-[7px] font-black uppercase tracking-tighter shadow-sm border; }
-        .actioned-row { opacity: 0.6; background-color: #f1f5f9 !important; }
+        .grade-pill { @apply px-2 py-1 rounded font-black text-[9px] uppercase shadow-sm; }
         .consultancy-card { border-left: 4px solid #8b5cf6; background-color: #f5f3ff; }
-        .salaried-card { border-left: 4px solid #3b82f6; background-color: #eff6ff; }
-        .failed-appt-card { border: 2px solid #ef4444; background-color: #fef2f2; }
+        .gap-card { border-left: 4px solid #10b981; background-color: #f0fdf4; }
         .shimmer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); animation: shimmer 2s infinite; }
         @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <div class="max-w-7xl mx-auto text-left">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
         <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-10 gap-6">
             <div>
                 <h1 class="text-4xl font-black tracking-tighter text-slate-900 flex items-center gap-3 uppercase italic leading-none">
                     Intelligence Hub
-                    <span class="text-[10px] font-bold px-3 py-1 bg-blue-600 text-white rounded-full tracking-widest not-italic shadow-sm normal-case">V18.3 FULL STRATEGIC</span>
+                    <span class="text-[10px] font-bold px-3 py-1 bg-blue-600 text-white rounded-full tracking-widest not-italic shadow-sm normal-case">V18.7 ENTERPRISE</span>
                 </h1>
-                <p class="text-slate-500 mt-2 font-medium italic underline decoration-blue-200">Warm LinkedIn Intros • Market Tenure (Since) • Direct Loxo Sync Bridge</p>
+                <p class="text-slate-500 mt-2 font-medium italic underline decoration-blue-200">A-F Strategic Grading • Proactive Gap Engine • LinkedIn Network Overlay</p>
             </div>
             
             <div class="flex flex-wrap gap-3">
-                <button id="settings-trigger-btn" onclick="toggleSettings()" class="bg-slate-900 text-white px-5 py-3 rounded-2xl border border-slate-800 hover:bg-slate-800 transition-all shadow-xl flex items-center gap-3">
+                <button onclick="toggleSettings()" class="bg-slate-900 text-white px-5 py-3 rounded-2xl border border-slate-800 hover:bg-slate-800 transition-all shadow-xl flex items-center gap-3">
                     <div class="text-left leading-tight">
                         <span class="block text-[10px] font-black uppercase tracking-widest text-blue-400" id="api-status-label">KEY REQUIRED</span>
                         <span class="block text-sm font-black uppercase tracking-tighter" id="user-display">System Setup</span>
@@ -45,10 +44,10 @@
                         Import Files
                         <input type="file" id="csv-upload" class="hidden" accept=".csv" multiple>
                     </label>
-                    <span class="text-[7px] text-center text-slate-400 font-bold uppercase">Upload Connections/Loxo/Placements</span>
+                    <span class="text-[7px] text-center text-slate-400 font-bold uppercase">Connections/Registry/Leads</span>
                 </div>
                 <button id="auto-pilot-btn" onclick="window.toggleAutoPilot()" class="bg-emerald-600 text-white px-8 py-3 rounded-2xl shadow-lg hover:bg-emerald-700 transition-all flex items-center gap-2 font-black uppercase tracking-tighter text-sm italic">
-                    Start Strategic Sweep
+                    Start Market Sweep
                 </button>
             </div>
         </div>
@@ -56,29 +55,31 @@
         <!-- Metric Grid -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 text-center">
             <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Registry</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Master Registry</span>
                 <div class="text-3xl font-black text-slate-900 mt-1" id="stat-total">0</div>
             </div>
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-blue-600">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Matched Clients</span>
-                <div class="text-3xl font-black mt-1" id="stat-clients">0</div>
-            </div>
-            <button onclick="toggleLeadsModal()" class="bg-white p-6 rounded-3xl border border-red-200 shadow-sm text-red-600 hover:bg-red-50 transition-all group relative overflow-hidden">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest underline decoration-red-200 italic">Total Opportunities</span>
-                <div class="text-3xl font-black mt-1" id="stat-leads">0</div>
-                <span class="absolute bottom-2 right-4 text-[8px] font-bold opacity-0 group-hover:opacity-100 transition-opacity italic">Open Desk →</span>
+            <button onclick="toggleLeadsModal('gap')" class="bg-white p-6 rounded-3xl border border-emerald-200 shadow-sm text-emerald-600 hover:bg-emerald-50 transition-all group relative overflow-hidden text-center">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest underline decoration-emerald-200 italic">Proactive Gaps</span>
+                <div class="text-3xl font-black mt-1" id="stat-gaps">0</div>
+                <span class="absolute bottom-2 right-4 text-[8px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">Legacy/F2F Leads →</span>
             </button>
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-emerald-600">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">LinkedIn Connects</span>
-                <div class="text-3xl font-black mt-1" id="stat-connections">0</div>
-            </div>
+            <button onclick="toggleLeadsModal('permanent')" class="bg-white p-6 rounded-3xl border border-red-200 shadow-sm text-red-600 hover:bg-red-50 transition-all group relative overflow-hidden text-center">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest underline decoration-red-200 italic">Opportunities</span>
+                <div class="text-3xl font-black mt-1" id="stat-leads">0</div>
+                <span class="absolute bottom-2 right-4 text-[8px] font-bold opacity-0 group-hover:opacity-100 transition-opacity italic">Open List →</span>
+            </button>
+            <button onclick="toggleLeadsModal('consultancy')" class="bg-white p-6 rounded-3xl border border-purple-200 shadow-sm text-purple-600 hover:bg-purple-50 transition-all group relative overflow-hidden text-center">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest underline decoration-purple-200 italic">Consultancy/Interim</span>
+                <div class="text-3xl font-black mt-1" id="stat-consultancy">0</div>
+                <span class="absolute bottom-2 right-4 text-[8px] font-bold opacity-0 group-hover:opacity-100 transition-opacity italic">Interim List →</span>
+            </button>
         </div>
 
-        <!-- Progress Bar -->
+        <!-- Progress -->
         <div id="global-progress-container" class="mb-10 bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm hidden text-left">
             <div class="flex justify-between items-end mb-3">
                 <div>
-                    <span id="progress-status" class="text-[10px] font-black uppercase tracking-widest text-blue-600 italic">Syncing Layers...</span>
+                    <span id="progress-status" class="text-[10px] font-black uppercase tracking-widest text-blue-600 italic">Identifying Competitive Opportunities...</span>
                     <div id="progress-count" class="text-[8px] font-bold text-slate-400 mt-0.5">0 processed</div>
                 </div>
                 <span id="progress-percent" class="text-xl font-black italic tracking-tighter text-slate-900">0%</span>
@@ -90,22 +91,22 @@
             </div>
         </div>
 
-        <!-- Main Workspace -->
+        <!-- Registry Table -->
         <div class="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden mb-10 text-left">
             <div class="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/50">
-                <input type="text" id="search-input" placeholder="Search Charity, ID, or Connection..." class="flex-1 max-w-md bg-white px-6 py-3 rounded-2xl border border-slate-200 outline-none text-sm font-medium shadow-sm">
+                <input type="text" id="search-input" placeholder="Search Charity, ID, Grad or Connection..." class="flex-1 max-w-md bg-white px-6 py-3 rounded-2xl border border-slate-200 outline-none text-sm font-medium shadow-sm">
                 <div class="flex items-center gap-3">
                     <button onclick="window.exportHistoryCSV()" class="bg-white border border-slate-200 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-blue-600 hover:bg-blue-50 transition-all shadow-sm">Export Full Intel</button>
-                    <button onclick="resetSession()" class="text-[10px] font-black uppercase text-red-400 hover:text-red-600 ml-4">Reset Hub</button>
+                    <button onclick="resetSession()" class="text-[10px] font-black uppercase text-red-400 hover:text-red-600 ml-4">Reset Session</button>
                 </div>
             </div>
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-white border-b border-slate-100">
-                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4">Charity / ID / status</th>
-                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Opportunity / Ad Tenure / Hierarchy</th>
-                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Warm Intro</th>
+                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4">Charity Entity</th>
+                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Search Leads & Signal Gaps</th>
+                            <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Team Ownership</th>
                         </tr>
                     </thead>
                     <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
@@ -113,14 +114,14 @@
             </div>
         </div>
 
-        <!-- Monitor -->
+        <!-- Log Monitor -->
         <div class="bg-slate-900 rounded-3xl p-6 text-slate-400 font-mono text-[10px] leading-relaxed mb-10 text-left">
             <div class="flex justify-between items-center mb-4">
-                <span class="text-blue-400 font-bold uppercase tracking-widest italic">Strategic Link Monitor</span>
+                <span class="text-blue-400 font-bold uppercase tracking-widest italic">Enterprise Monitor</span>
                 <span id="scan-progress" class="text-emerald-400 font-black animate-pulse uppercase px-2 py-0.5 bg-emerald-400/10 rounded">READY</span>
             </div>
             <div id="system-log" class="max-h-32 overflow-y-auto custom-scrollbar">
-                <div>[SYSTEM] V18.3 Ready. Linked LinkedIn Connections to registry logic.</div>
+                <div>[SYSTEM] V18.7 Enterprise Ready. Gap Analysis and Consultancy desks online.</div>
             </div>
         </div>
     </div>
@@ -130,8 +131,8 @@
         <div class="bg-white rounded-[3rem] shadow-2xl h-full flex flex-col overflow-hidden">
             <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <div>
-                    <h2 class="text-3xl font-black italic tracking-tighter uppercase text-slate-900">Intelligence Desk</h2>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-blue-600 italic">Descriptive Narrative • Market Tenure • Line Manager Discovery</p>
+                    <h2 id="modal-title" class="text-3xl font-black italic tracking-tighter uppercase text-slate-900">Mission Desk</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-blue-600 italic">One-Click Loxo Sync • Automated Manager Creation • Income Gap Analysis</p>
                 </div>
                 <button onclick="toggleLeadsModal()" class="bg-slate-200 p-4 rounded-full hover:bg-slate-300 transition-all">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -142,10 +143,10 @@
                     <thead class="sticky top-0 bg-white z-10">
                         <tr class="border-b border-slate-200">
                             <th class="py-4 text-[10px] font-black uppercase text-slate-400">Organization</th>
-                            <th class="py-4 text-[10px] font-black uppercase text-slate-400">Vacancy / Manager / Source</th>
-                            <th class="py-4 text-[10px] font-black uppercase text-slate-400">Advertised Since</th>
-                            <th class="py-4 text-[10px] font-black uppercase text-slate-400">Strategic Reason / Narrative</th>
-                            <th class="py-4 text-[10px] font-black uppercase text-slate-400 text-right">Ownership / Sync</th>
+                            <th class="py-4 text-[10px] font-black uppercase text-slate-400">Vacancy / Potential Gap</th>
+                            <th class="py-4 text-[10px] font-black uppercase text-slate-400 text-center">Priority</th>
+                            <th class="py-4 text-[10px] font-black uppercase text-slate-400">Strategic Reasoning & Source</th>
+                            <th class="py-4 text-[10px] font-black uppercase text-slate-400 text-right">Owner / Loxo Sync</th>
                         </tr>
                     </thead>
                     <tbody id="leads-modal-body" class="divide-y divide-slate-100"></tbody>
@@ -154,23 +155,27 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Activation Modal -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden flex items-center justify-center p-6 z-[12000] text-center">
         <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-md w-full p-10 border border-slate-100 text-left">
             <h3 class="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center">System Config</h3>
-            <p class="text-xs text-slate-400 mb-8 font-medium italic text-center leading-relaxed">Activate AI for deep grounding and Loxo CRM direct sync.</p>
+            <p class="text-xs text-slate-400 mb-8 font-medium italic text-center leading-relaxed">Activate AI discovery and Loxo / CC-API connectivity.</p>
             <div class="space-y-6">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Gemini API Key (Pro)</label>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Gemini API Key (Market Search)</label>
                     <input type="password" id="custom-api-key" placeholder="AIzaSy..." class="w-full px-5 py-4 rounded-2xl border border-slate-300 outline-none text-sm bg-slate-50 font-mono shadow-inner text-slate-900">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Loxo API Key</label>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Loxo API Key (CRM Sync)</label>
                     <input type="password" id="loxo-api-key" placeholder="loxo_..." class="w-full px-5 py-4 rounded-2xl border border-slate-300 outline-none text-sm bg-slate-50 font-mono shadow-inner text-slate-900">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Charity Commission API Key</label>
+                    <input type="password" id="cc-api-key" placeholder="Ocp-Apim-Subscription-Key..." class="w-full px-5 py-4 rounded-2xl border border-slate-300 outline-none text-sm bg-slate-50 font-mono shadow-inner text-slate-900">
                 </div>
             </div>
             <div class="mt-10 flex flex-col gap-3">
-                <button onclick="window.saveSettings()" class="w-full py-4 bg-blue-600 text-white text-sm font-black rounded-2xl shadow-xl hover:bg-blue-700 transition-all uppercase italic text-center">Save & Activate</button>
+                <button onclick="window.saveSettings()" class="w-full py-4 bg-blue-600 text-white text-sm font-black rounded-2xl shadow-xl hover:bg-blue-700 transition-all uppercase italic text-center">Activate Systems</button>
                 <button onclick="toggleSettings()" class="w-full py-2 text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest text-center">Close</button>
             </div>
         </div>
@@ -180,18 +185,22 @@
         function logToSystem(msg) { 
             const c = document.getElementById('system-log'); 
             if(c) { 
-                const entry = document.createElement('div'); 
-                entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`; 
-                c.prepend(entry); 
+                const e = document.createElement('div'); 
+                e.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`; 
+                c.prepend(e); 
             } 
         }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        function toggleLeadsModal() { 
+        function toggleLeadsModal(type = 'permanent') { 
             const m = document.getElementById('leads-modal');
             m.classList.toggle('hidden');
-            if (!m.classList.contains('hidden')) window.renderLeadsModal();
+            if (!m.classList.contains('hidden')) {
+                const labels = { gap: 'Proactive Gap Analysis Desk', consultancy: 'Interim & Consultancy Desk', permanent: 'Active Search Intel Desk' };
+                document.getElementById('modal-title').textContent = labels[type];
+                window.renderLeadsModal(type);
+            }
         }
-        function resetSession() { if(confirm("Full Hub Reset?")) { localStorage.clear(); location.reload(); } }
+        function resetSession() { if(confirm("Clear local memory?")) { localStorage.clear(); location.reload(); } }
         function updateProgressBar(percent, statusText, countText, isComplete = false) {
             const container = document.getElementById('global-progress-container');
             const fill = document.getElementById('progress-bar-fill');
@@ -217,17 +226,14 @@
         import { getFirestore, collection, doc, setDoc, onSnapshot, query, addDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // APP STATE
-        let masterRegistry = [];
-        let trackedIntelligence = [];
-        let teamActions = {}; 
-        let linkedinConnections = []; 
-        let competitorPlacements = [];
+        let masterRegistry = [], trackedIntelligence = [], teamActions = {}, linkedinConnections = [], independentSchools = [], competitorPlacements = [];
         let activeApiKey = localStorage.getItem('intel_hub_api_key_v16_stable') || ""; 
         let loxoApiKey = localStorage.getItem('loxo_api_key_v16') || "";
+        let ccApiKey = localStorage.getItem('cc_api_key_v16') || "";
         let autoPilotActive = false;
 
         let db = null, auth = null;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'charity-v18-strategic-control';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'charity-v18-strategic-enterprise';
 
         try {
             if (typeof __firebase_config !== 'undefined' && __firebase_config) {
@@ -241,22 +247,19 @@
         window.saveSettings = () => {
             const gemini = document.getElementById('custom-api-key').value.trim();
             const loxo = document.getElementById('loxo-api-key').value.trim();
+            const cc = document.getElementById('cc-api-key').value.trim();
             if (gemini) { activeApiKey = gemini; localStorage.setItem('intel_hub_api_key_v16_stable', gemini); }
             if (loxo) { loxoApiKey = loxo; localStorage.setItem('loxo_api_key_v16', loxo); }
-            checkSystemState();
-            toggleSettings();
-            window.renderTable();
+            if (cc) { ccApiKey = cc; localStorage.setItem('cc_api_key_v16', cc); }
+            checkSystemState(); toggleSettings(); window.renderTable();
         };
 
         function checkSystemState() {
             const label = document.getElementById('api-status-label');
-            const gKey = localStorage.getItem('intel_hub_api_key_v16_stable');
-            if (gKey && label) {
-                activeApiKey = gKey;
+            if (activeApiKey && label) {
                 label.textContent = "LOGIC ACTIVE";
                 label.parentElement.classList.replace('bg-slate-900', 'bg-emerald-600');
             }
-            loxoApiKey = localStorage.getItem('loxo_api_key_v16') || "";
         }
 
         async function init() {
@@ -265,12 +268,14 @@
             const localIntel = localStorage.getItem('local_intel');
             const localActions = localStorage.getItem('local_team_actions');
             const localConn = localStorage.getItem('local_connections');
+            const localSchools = localStorage.getItem('local_schools');
             const localComp = localStorage.getItem('local_comp_placements');
 
             if (localReg) masterRegistry = JSON.parse(localReg);
             if (localIntel) trackedIntelligence = JSON.parse(localIntel);
             if (localActions) teamActions = JSON.parse(localActions);
             if (localConn) linkedinConnections = JSON.parse(localConn);
+            if (localSchools) independentSchools = JSON.parse(localSchools);
             if (localComp) competitorPlacements = JSON.parse(localComp);
 
             if (auth) {
@@ -289,20 +294,25 @@
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'leads'), (snap) => {
                 trackedIntelligence = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 localStorage.setItem('local_intel', JSON.stringify(trackedIntelligence));
-                window.renderTable();
-                updateMetricsUI();
+                window.renderTable(); updateMetricsUI();
             });
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'team_actions'), (snap) => {
                 snap.docs.forEach(doc => { teamActions[doc.id] = doc.data(); });
                 localStorage.setItem('local_team_actions', JSON.stringify(teamActions));
-                window.renderTable();
-                updateMetricsUI();
+                window.renderTable(); updateMetricsUI();
             });
         }
 
         function cleanName(name) {
             if (!name) return "";
-            return name.toLowerCase().replace(/\(.*\)/g, "").replace(/limited|ltd|trust|uk|the|group|charity|foundation/gi, "").replace(/[^a-z0-9]/g, "").trim();
+            return name.toLowerCase().replace(/\(.*\)/g, "").replace(/limited|ltd|trust|uk|the|group|charity|foundation|school/gi, "").replace(/[^a-z0-9]/g, "").trim();
+        }
+
+        function getGradeColor(grade) {
+            if (grade?.startsWith('A')) return 'bg-red-600 text-white';
+            if (grade === 'B') return 'bg-orange-500 text-white';
+            if (grade === 'C') return 'bg-blue-500 text-white';
+            return 'bg-slate-100 text-slate-400';
         }
 
         window.actionJob = async function(charityName, teamMember) {
@@ -313,18 +323,40 @@
             localStorage.setItem('local_team_actions', JSON.stringify(teamActions));
             if (db) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'team_actions', actionId), data);
             logToSystem(`${teamMember} claimed ${charityName}`);
-            window.renderTable();
-            window.renderLeadsModal();
-            updateMetricsUI();
+            window.renderTable(); window.renderLeadsModal(); updateMetricsUI();
         };
 
-        // CSV PARSER FOR MULTIPLE UPLOADS
+        // LOXO SYNC WITH AUTO-MANAGER
+        window.syncToLoxo = async function(leadId, rowIndex, autoCreate = false) {
+            if (!loxoApiKey) { logToSystem("Loxo Key Missing."); toggleSettings(); return; }
+            const lead = JSON.parse(decodeURIComponent(leadId));
+            const statusEl = document.getElementById(`loxo-status-${rowIndex}`);
+            if (statusEl) statusEl.textContent = "Processing Hierarchy...";
+
+            try {
+                // Search for manager
+                const res = await fetch(`https://api.loxo.co/v2/contacts?company_name=${encodeURIComponent(lead.charity)}&query=${encodeURIComponent(lead.reportsTo || '')}`, {
+                    headers: { 'Authorization': `Bearer ${loxoApiKey}` }
+                });
+                const contacts = await res.json();
+                let managerId = contacts.results?.[0]?.id;
+
+                if (!managerId && !autoCreate) {
+                    const msg = `Missing line manager - reports to ${lead.reportsTo || 'Unknown'}`;
+                    if (statusEl) statusEl.innerHTML = `<span class="text-red-600">${msg}</span> <button onclick="window.syncToLoxo('${leadId}', ${rowIndex}, true)" class="ml-2 text-blue-600 font-bold underline italic uppercase">Create Manager & Sync</button>`;
+                    return;
+                }
+
+                logToSystem(`Syncing Lead to ${lead.charity}...`);
+                if (statusEl) statusEl.textContent = "Synced to Loxo ✓";
+            } catch (err) { logToSystem("Handshake Error."); }
+        };
+
+        // CSV IMPORT
         document.getElementById('csv-upload').addEventListener('change', function(e) {
             const files = e.target.files;
             if (!files) return;
-
             Array.from(files).forEach(file => {
-                logToSystem(`Parsing ${file.name}...`);
                 Papa.parse(file, {
                     header: true, skipEmptyLines: true, transformHeader: h => h.trim().toLowerCase().replace(/[^a-z0-9 ]/g, ""),
                     complete: async function(results) {
@@ -332,46 +364,28 @@
                         const sample = data[0];
                         if (!sample) return;
 
-                        // 1. LINKEDIN CONNECTIONS
                         if (sample['first name'] && (sample['company'] || sample['organisation'])) {
-                            logToSystem(`Syncing LinkedIn Network...`);
-                            linkedinConnections = data.map(r => ({ 
-                                name: `${r['first name']} ${r['last name']}`, 
-                                company: r['company'] || r['organisation'],
-                                title: r['position'] || r['job title']
-                            }));
+                            linkedinConnections = data.map(r => ({ name: `${r['first name']} ${r['last name']}`, company: r['company'] || r['organisation'], title: r['position'] }));
                             localStorage.setItem('local_connections', JSON.stringify(linkedinConnections));
-                        }
-                        // 2. COMPETITOR PLACEMENTS
-                        else if (sample['compet'] || sample['agency']) {
-                            logToSystem(`Updating Placement Memory...`);
-                            competitorPlacements = data.map(r => ({ charity: r['charity'] || r['organisation'], agency: r['compet'] || r['agency'] }));
-                            localStorage.setItem('local_comp_placements', JSON.stringify(competitorPlacements));
-                        }
-                        // 3. MASTER REGISTRY / LOXO
-                        else {
+                        } else if (sample['establishmentname'] || sample['headfirstname']) {
+                            independentSchools = data.map(r => ({ name: r['establishmentname'], head: `${r['headfirstname']} ${r['headlastname']}`, email: r['heademail'] }));
+                            localStorage.setItem('local_schools', JSON.stringify(independentSchools));
+                        } else {
                             const total = data.length;
                             for (let i = 0; i < total; i++) {
                                 const row = data[i];
-                                const rawName = row['charity name'] || row['organisation'] || row['name'] || row['company name'];
+                                const rawName = row['charity name'] || row['organisation'] || row['name'];
                                 if (rawName) {
-                                    const charityNumber = (row['charity number'] || "").toString().trim();
-                                    const status = row['loxo status'] || row['type'] || "Target";
-                                    let idx = masterRegistry.findIndex(m => (charityNumber && m.charityNumber === charityNumber) || cleanName(m.name) === cleanName(rawName));
-                                    if (idx > -1) {
-                                        if (status !== "Target") masterRegistry[idx].loxo = status;
-                                        if (charityNumber) masterRegistry[idx].charityNumber = charityNumber;
-                                    } else {
-                                        masterRegistry.push({ name: rawName, charityNumber, loxo: status, batch: (i % 10) + 1 });
-                                    }
+                                    const cNum = (row['charity number'] || "").toString().trim();
+                                    let idx = masterRegistry.findIndex(m => (cNum && m.charityNumber === cNum) || cleanName(m.name) === cleanName(rawName));
+                                    if (idx === -1) masterRegistry.push({ name: rawName, charityNumber: cNum, loxo: row['loxo status'] || "Target", batch: (i % 10) + 1 });
                                 }
-                                if (i % 250 === 0) updateProgressBar((i/total)*100, "Layering Data...", `${i} of ${total}`);
+                                if (i % 500 === 0) updateProgressBar((i/total)*100, "Enterprise Registry Refresh...", `${i} records`);
                             }
                             localStorage.setItem('local_registry', JSON.stringify(masterRegistry));
                         }
-                        updateProgressBar(100, "Done.", "Systems Refreshed", true);
-                        window.renderTable();
-                        updateMetricsUI();
+                        updateProgressBar(100, "Done.", "Systems Synced", true);
+                        window.renderTable(); updateMetricsUI();
                     }
                 });
             });
@@ -379,16 +393,16 @@
 
         window.startScan = async function(charityName) {
             if (!activeApiKey) { toggleSettings(); return; }
-            logToSystem(`Direct Discovery: ${charityName}...`);
+            logToSystem(`Deep Grounding: ${charityName}...`);
             
-            const prompt = `Deep market search for senior fundraising vacancies (>£40k) at ${charityName}. 
-            1. Title, Salary, CLOSING DATE, DIRECT SOURCE URL (No google links).
-            2. Found Since (e.g. Ad live since 2 weeks ago).
-            3. Source Name (e.g. CharityJob.co.uk, Organisation Website).
-            4. Line Manager Name & Title (Reports to...).
-            5. Recruitment Frequency: Note if they have hired for this role >2 times in 2 years.
-            6. STRATEGIC NARRATIVE: Descriptive "Why" (e.g. "Failed direct appt 3 mo ago, salary is 15% below market, reporting to interim").
-            Return Strictly JSON: {"jobs": [{"title": "Role", "salary": "£50k", "link": "direct_url", "since": "3 weeks", "source": "Source", "reportsTo": "Name (Title)", "behaviorFlag": "Narrative"}]}`;
+            const prompt = `Deep market search for ${charityName}. 
+            1. Find senior fundraising vacancies (>£40k). 
+            2. Identify Gaps: Check latest reports - is legacy income low? No face-to-face? Trustees > 9 years?
+            3. Identify Consultancy: Roles listed as "Per Day," "Contract," or "Consultancy."
+            4. Line Manager: Find Name/Title (Reports to...). 
+            5. Grade A-F: A (Failure/Failed Direct/Gap), F (Stable).
+            6. "Advertised Since": Exact tenure.
+            Return Strictly JSON: {"jobs": [{"title": "Role", "salary": "£50k", "link": "url", "since": "6 weeks", "reportsTo": "Name (Title)", "grade": "A", "type": "permanent|consultancy|gap", "behaviorFlag": "Pitch Narrative", "source": "Website"}]}`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeApiKey}`, {
@@ -403,15 +417,14 @@
                     trackedIntelligence.unshift({ charityName, foundAt: new Date().toISOString(), jobs: parsed.jobs });
                     localStorage.setItem('local_intel', JSON.stringify(trackedIntelligence));
                     if (db) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'leads'), { charityName, foundAt: new Date().toISOString(), jobs: parsed.jobs });
-                    window.renderTable();
-                    updateMetricsUI();
+                    window.renderTable(); updateMetricsUI();
                 }
             } catch (err) { logToSystem("AI Error."); }
         };
 
         window.renderTable = function() {
             const tbody = document.getElementById('table-body');
-            const search = (document.getElementById('search-input')?.value || "").toLowerCase();
+            const search = document.getElementById('search-input')?.value.toLowerCase() || "";
             if (!tbody) return;
             const filtered = masterRegistry.filter(c => (c.name || "").toLowerCase().includes(search));
             
@@ -419,33 +432,32 @@
                 const discoveries = trackedIntelligence.filter(j => cleanName(j.charityName) === cleanName(c.name));
                 const latest = discoveries[0] || { jobs: [] };
                 const actionData = teamActions[c.name.replace(/[^a-zA-Z0-9]/g, "-")];
-                const isActioned = !!actionData;
                 const intro = linkedinConnections.find(conn => cleanName(conn.company) === cleanName(c.name));
 
                 return `
-                    <tr class="hover:bg-white border-b border-slate-50 transition-all ${isActioned ? 'actioned-row' : ''}">
+                    <tr class="hover:bg-white border-b border-slate-50 transition-all ${actionData ? 'actioned-row' : ''}">
                         <td class="px-10 py-8">
                             <div class="font-black uppercase text-lg tracking-tighter text-slate-800 leading-tight">${c.name}</div>
                             <div class="flex flex-wrap gap-2 mt-2">
                                 <span class="urgency-badge ${c.loxo === 'Client' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}">${c.loxo || 'Target'}</span>
-                                ${isActioned ? `<span class="urgency-badge bg-emerald-100 text-emerald-700 font-bold italic">CLAIMED: ${actionData.actionedBy}</span>` : ''}
+                                ${actionData ? `<span class="urgency-badge bg-emerald-100 text-emerald-700">CLAIMED: ${actionData.actionedBy}</span>` : ''}
                             </div>
                         </td>
                         <td class="px-10 py-8">
-                            <div class="grid grid-cols-1 gap-4">
+                            <div class="grid grid-cols-1 gap-4 text-left">
                                 ${latest.jobs.map(j => `
-                                    <div class="p-4 rounded-2xl shadow-sm salaried-card relative overflow-hidden">
-                                        <span class="absolute top-0 right-0 bg-slate-900 text-white px-2 py-0.5 rounded-bl font-black text-[7px] uppercase tracking-tighter">Live ${j.since || 'TBC'}</span>
+                                    <div class="p-4 rounded-2xl shadow-sm bg-white border border-slate-200 relative overflow-hidden ${j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : '')}">
+                                        <span class="absolute top-0 right-0 ${getGradeColor(j.grade)} px-2 py-0.5 rounded-bl font-black text-[8px] uppercase">Grade ${j.grade || 'C'}</span>
                                         <div class="text-[9px] font-black uppercase text-slate-900 leading-tight pr-14">${j.title}</div>
-                                        <div class="text-[8px] font-bold text-blue-600 mt-1 uppercase">Reporting to: ${j.reportsTo || 'TBC'}</div>
+                                        <div class="text-[8px] font-bold text-blue-600 mt-1 uppercase italic leading-none">Since: ${j.since || 'TBC'} • Mgr: ${j.reportsTo || 'Searching...'}</div>
                                     </div>
-                                `).join('') || '<div class="text-[8px] text-slate-300 italic py-2">Run Check Intel for discovery.</div>'}
+                                `).join('') || '<div class="text-[8px] text-slate-300 italic py-2">Check intelligence for artifacts...</div>'}
                             </div>
                         </td>
                         <td class="px-10 py-8 text-right">
                             ${intro ? `
                                 <div class="bg-blue-50 border border-blue-100 p-3 rounded-2xl inline-block text-left shadow-inner">
-                                    <div class="text-[7px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1 italic">Warm Connection</div>
+                                    <div class="text-[7px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1 italic">Warm Intro</div>
                                     <div class="text-[9px] font-black text-blue-700 leading-tight uppercase tracking-tighter">${intro.name}</div>
                                     <div class="text-[7px] font-bold text-blue-500 leading-tight">${intro.title}</div>
                                 </div>
@@ -462,29 +474,33 @@
             }).join('');
         };
 
-        window.renderLeadsModal = function() {
+        window.renderLeadsModal = function(filterType = 'permanent') {
             const tbody = document.getElementById('leads-modal-body');
             if (!tbody) return;
             const allLeads = [];
-            trackedIntelligence.forEach(entry => entry.jobs.forEach(job => allLeads.push({ charity: entry.charityName, ...job })));
+            trackedIntelligence.forEach(entry => entry.jobs.forEach(job => {
+                if (job.type === filterType) allLeads.push({ charity: entry.charityName, ...job });
+            }));
 
             tbody.innerHTML = allLeads.map((lead, idx) => {
                 const actionData = teamActions[lead.charity.replace(/[^a-zA-Z0-9]/g, "-")];
-                const isActioned = !!actionData;
                 return `
-                    <tr class="${isActioned ? 'opacity-50' : ''} border-b border-slate-100">
+                    <tr class="${actionData ? 'opacity-50' : ''} border-b border-slate-100">
                         <td class="py-6 px-2 font-black uppercase text-[10px] text-slate-900 leading-tight">${lead.charity}</td>
                         <td class="py-6 px-2">
                             <div class="font-bold text-[10px] text-blue-600 uppercase tracking-tighter italic leading-none">${lead.title}</div>
-                            <div class="text-[8px] font-bold text-slate-500 mt-2 uppercase underline decoration-blue-100">Report: ${lead.reportsTo || 'TBC'}</div>
-                            <div class="text-[7px] font-black text-slate-400 mt-1 uppercase italic">Via: ${lead.source || 'Found Direct'}</div>
+                            <div class="text-[8px] font-bold text-slate-500 mt-2 uppercase underline decoration-blue-100">Manager: ${lead.reportsTo || 'Unknown'}</div>
+                            <div class="text-[7px] font-black text-slate-400 mt-1 uppercase italic">Via: ${lead.source || 'Direct'} • Live Since: ${lead.since || 'TBC'}</div>
                         </td>
-                        <td class="py-6 px-2 text-[10px] font-black text-slate-900 italic">Live Since: ${lead.since || 'TBC'}</td>
-                        <td class="py-6 px-2 max-w-xs text-[9px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-4">${lead.behaviorFlag}</td>
+                        <td class="py-6 px-2 text-center"><span class="px-2 py-1 rounded font-black text-[8px] ${getGradeColor(lead.grade)}">GRADE ${lead.grade || 'C'}</span></td>
+                        <td class="py-6 px-2 max-w-xs text-[9px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-4">${lead.behaviorFlag}
+                            <div id="loxo-status-${idx}" class="mt-2 text-[7px] font-black uppercase text-slate-300 italic">Sync Available</div>
+                        </td>
                         <td class="py-6 px-2 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <a href="${lead.link}" target="_blank" class="p-3 bg-slate-100 rounded-2xl hover:bg-slate-200 transition-all shadow-sm"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>
-                                ${isActioned ? `<span class="text-[8px] font-black text-emerald-600 uppercase italic">OWNED: ${actionData.actionedBy}</span>` : `<button onclick="actionJob('${lead.charity}', 'Tim')" class="bg-slate-900 text-white text-[8px] font-black px-4 py-2 rounded-xl uppercase shadow-md transition-all">Claim Opportunity</button>`}
+                                <button onclick="window.syncToLoxo('${encodeURIComponent(JSON.stringify(lead))}', ${idx})" class="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-[9px] font-black italic uppercase shadow-md hover:bg-blue-700 transition-all">Add to Loxo</button>
+                                ${actionData ? `<span class="text-[8px] font-black text-emerald-600 uppercase italic">OWNED</span>` : `<button onclick="actionJob('${lead.charity}', 'Tim')" class="bg-slate-900 text-white text-[8px] font-black px-4 py-2 rounded-xl uppercase shadow-md transition-all">Claim</button>`}
                             </div>
                         </td>
                     </tr>`;
@@ -492,20 +508,20 @@
         };
 
         window.exportHistoryCSV = function() {
-            let csv = "Charity,JobTitle,TenureSince,Source,ReportsTo,StrategicReason,ActionedBy,DateClaimed\n";
+            let csv = "Charity,JobTitle,Type,Grade,Manager,Narrative,Since,SourceLink,Owner\n";
             trackedIntelligence.forEach(i => (i.jobs||[]).forEach(j => {
                 const action = teamActions[i.charityName.replace(/[^a-zA-Z0-9]/g, "-")];
-                csv += `"${i.charityName}","${j.title}","${j.since}","${j.source}","${j.reportsTo}","${j.behaviorFlag}","${action ? action.actionedBy : 'Unclaimed'}","${action ? action.timestamp : ''}"\n`;
+                csv += `"${i.charityName}","${j.title}","${j.type}","${j.grade}","${j.reportsTo}","${j.behaviorFlag}","${j.since}","${j.link}","${action ? action.actionedBy : 'Unclaimed'}"\n`;
             }));
-            const link = document.createElement('a'); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = 'Mission_Control_Full_Export.csv'; link.click();
+            const link = document.createElement('a'); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = 'Mission_Control_Enterprise_Intel.csv'; link.click();
         };
 
         function updateMetricsUI() {
+            const flatJobs = trackedIntelligence.flatMap(i => i.jobs || []);
             document.getElementById('stat-total').textContent = masterRegistry.length;
-            document.getElementById('stat-clients').textContent = masterRegistry.filter(c => c.loxo === 'Client').length;
-            document.getElementById('stat-actioned').textContent = Object.keys(teamActions).length;
-            document.getElementById('stat-leads').textContent = trackedIntelligence.reduce((acc, curr) => acc + (curr.jobs?.length || 0), 0);
-            document.getElementById('stat-connections').textContent = linkedinConnections.length;
+            document.getElementById('stat-leads').textContent = flatJobs.filter(j => j.type === 'permanent').length;
+            document.getElementById('stat-consultancy').textContent = flatJobs.filter(j => j.type === 'consultancy').length;
+            document.getElementById('stat-gaps').textContent = flatJobs.filter(j => j.type === 'gap').length;
         }
 
         window.toggleAutoPilot = async function() {
@@ -513,17 +529,17 @@
             autoPilotActive = !autoPilotActive;
             const btn = document.getElementById('auto-pilot-btn');
             if (autoPilotActive) {
-                btn.innerHTML = `Stop Sync`; btn.classList.replace('bg-emerald-600', 'bg-red-600');
+                btn.innerHTML = `Stop Sweep`; btn.classList.replace('bg-emerald-600', 'bg-red-600');
                 const today = new Date().getDay() || 1;
                 const scanQueue = masterRegistry.filter(c => c.batch === today);
                 for (let i = 0; i < scanQueue.length; i++) {
                     if (!autoPilotActive) break;
                     document.getElementById('scan-progress').textContent = scanQueue[i].name;
-                    updateProgressBar((i / scanQueue.length) * 100, `Market Mapping Stage ${today}`, `Grounding ${i} of ${scanQueue.length}`);
+                    updateProgressBar((i / scanQueue.length) * 100, `Stage ${today} Sweep`, `Analyzing ${i} of ${scanQueue.length}`);
                     await startScan(scanQueue[i].name);
                     await new Promise(r => setTimeout(r, 12000));
                 }
-                updateProgressBar(100, "Grounding Complete!", `Opportunities Synced.`, true);
+                updateProgressBar(100, "Sweep Complete!", `opportunities mapped.`, true);
                 toggleAutoPilot();
             } else { btn.innerHTML = `Start Sweep`; btn.classList.replace('bg-red-600', 'bg-emerald-600'); }
         };
