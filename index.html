@@ -22,9 +22,10 @@ import {
   FileText
 } from 'lucide-react';
 
-// --- UTILITIES ---
+// --- CONFIG ---
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
+// --- UTILITIES ---
 const cleanName = (name) => {
   if (!name) return "";
   return name.toLowerCase()
@@ -34,13 +35,11 @@ const cleanName = (name) => {
     .trim();
 };
 
-const extractDirectUrl = (url) => {
+const extractUrl = (url) => {
   if (!url) return "#";
   if (url.includes("google.com/search?q=")) {
-    try {
-      const match = url.match(/q=([^&]+)/);
-      return match ? decodeURIComponent(match[1]) : url;
-    } catch (e) { return url; }
+    const parts = url.split("q=");
+    if (parts[1]) return decodeURIComponent(parts[1].split("&")[0]);
   }
   return url;
 };
@@ -55,7 +54,7 @@ const getGradeColor = (grade) => {
 
 // --- MAIN APPLICATION ---
 export default function App() {
-  // Global Data Store
+  // Persistence States
   const [registry, setRegistry] = useState([]);
   const [intel, setIntel] = useState([]);
   const [teamActions, setTeamActions] = useState({});
@@ -63,33 +62,33 @@ export default function App() {
   const [schools, setSchools] = useState([]);
   const [placements, setPlacements] = useState([]);
 
-  // UI Flow State
+  // UI States
   const [isAdmin, setIsAdmin] = useState(true);
   const [activeModal, setActiveModal] = useState(null); 
   const [searchQuery, setSearchQuery] = useState("");
-  const [logs, setLogs] = useState(["[SYSTEM] Enterprise V19.4 Active. All systems nominal."]);
+  const [logs, setLogs] = useState(["[SYSTEM] Enterprise V19.6 Active. Stability Patch deployed."]);
   
-  // Storage Keys
+  // Keys
   const [keys, setKeys] = useState({
     gemini: localStorage.getItem('hub_gemini_key') || "",
     loxo: localStorage.getItem('hub_loxo_key') || "",
     cc: localStorage.getItem('hub_cc_key') || ""
   });
 
-  // Load Persistence
+  // Load persistence on mount
   useEffect(() => {
-    const load = (key) => JSON.parse(localStorage.getItem(key) || "null");
-    const reg = load('hub_registry'); if (reg) setRegistry(reg);
-    const itl = load('hub_intel'); if (itl) setIntel(itl);
-    const act = load('hub_actions'); if (act) setTeamActions(act);
-    const con = load('hub_connections'); if (con) setConnections(con);
-    const sch = load('hub_schools'); if (sch) setSchools(sch);
-    const plc = load('hub_placements'); if (plc) setPlacements(plc);
+    const grab = (k) => JSON.parse(localStorage.getItem(k) || "null");
+    const r = grab('hub_registry'); if (r) setRegistry(r);
+    const i = grab('hub_intel'); if (i) setIntel(i);
+    const a = grab('hub_actions'); if (a) setTeamActions(a);
+    const c = grab('hub_connections'); if (c) setConnections(c);
+    const s = grab('hub_schools'); if (s) setSchools(s);
+    const p = grab('hub_placements'); if (p) setPlacements(p);
   }, []);
 
-  const addLog = (msg) => setLogs(p => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...p].slice(0, 40));
+  const addLog = (msg) => setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev].slice(0, 30));
 
-  // --- CSV HANDLER ---
+  // --- HIGH STABILITY CSV HANDLER ---
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     files.forEach(file => {
@@ -98,74 +97,78 @@ export default function App() {
       reader.onload = (event) => {
         const text = event.target.result;
         const lines = text.split('\n').filter(l => l.trim());
-        const headers = lines[0].toLowerCase().split(',').map(h => h.replace(/"/g, "").trim());
+        const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+        
         const data = lines.slice(1).map(line => {
-          const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
+          const vals = line.split(',');
           let obj = {};
-          headers.forEach((h, i) => obj[h] = values[i]?.replace(/"/g, "").trim());
+          headers.forEach((h, i) => {
+            if (vals[i]) obj[h] = vals[i].trim().replace(/^"|"$/g, "");
+          });
           return obj;
         });
 
         const sample = data[0] || {};
 
-        // 1. LINKEDIN CONNECTIONS
+        // 1. LINKEDIN NETWORK
         if (sample['first name'] && (sample['company'] || sample['organisation'])) {
-          addLog(`Integrated ${data.length} network contacts.`);
+          addLog(`Integrated LinkedIn connection layer.`);
           setConnections(data);
           localStorage.setItem('hub_connections', JSON.stringify(data));
         }
         // 2. IDPE SCHOOLS
         else if (sample['establishmentname'] || sample['headfirstname']) {
-          addLog(`Mapped IDPE school details.`);
+          addLog(`Mapped IDPE school database.`);
           setSchools(data);
           localStorage.setItem('hub_schools', JSON.stringify(data));
         }
-        // 3. HISTORY / PLACEMENTS
-        else if (sample['compet'] || sample['agencyscore'] || sample['job titile']) {
-          const newPlc = data.map(r => ({ charity: r['charity'] || r['organisation'], agency: r['compet'] || r['agency'] }));
-          setPlacements(prev => [...newPlc, ...prev]);
-          localStorage.setItem('hub_placements', JSON.stringify([...newPlc, ...placements]));
-          addLog(`Recruitment history added.`);
+        // 3. HISTORY/PLACEMENTS
+        else if (sample['compet'] || sample['agencyscore']) {
+          addLog(`Ingested historical agency performance data.`);
+          const newP = data.map(r => ({ charity: r['charity'] || r['organisation'], agency: r['compet'] || r['agency'] }));
+          const updatedP = [...newP, ...placements];
+          setPlacements(updatedP);
+          localStorage.setItem('hub_placements', JSON.stringify(updatedP));
         }
         // 4. REGISTRY / ACTIVE LEADS
         else {
           const isLeads = sample['job title'] || sample['title'];
           if (isLeads) {
-            addLog(`Injecting ${data.length} vacancies.`);
+            addLog(`Injecting vacancies into intelligence stream.`);
             const leads = data.map(r => ({
               charityName: r['organisation'] || r['charity'],
               foundAt: new Date().toISOString(),
               jobs: [{
                 title: r['job title'] || r['title'],
                 salary: r['salary'] || "TBC",
-                link: extractDirectUrl(r['link'] || r['url']),
+                link: extractUrl(r['link'] || r['url']),
                 since: r['advertised since'] || "Recently",
                 reportsTo: r['reports to'] || "CEO",
-                grade: r['grade'] || (r['note']?.toLowerCase().includes('failed') ? 'A' : 'B'),
+                grade: r['grade'] || (r['note']?.toLowerCase().includes('failed') ? 'A' : 'C'),
                 type: (r['salary']?.toLowerCase().includes('day') || r['job title']?.toLowerCase().includes('consultant')) ? 'consultancy' : 'permanent',
-                behaviorFlag: r['reason'] || r['note'] || "Market search artifact",
-                source: r['source'] || "Imported"
+                behaviorFlag: r['reason'] || r['note'] || "Manual lead upload",
+                source: r['source'] || "Import"
               }]
             }));
-            const updatedIntel = [...leads, ...intel];
-            setIntel(updatedIntel);
-            localStorage.setItem('hub_intel', JSON.stringify(updatedIntel));
+            const updatedI = [...leads, ...intel];
+            setIntel(updatedI);
+            localStorage.setItem('hub_intel', JSON.stringify(updatedI));
           } else {
-            const newReg = [...registry];
+            addLog(`Refining Master Map...`);
+            const newR = [...registry];
             data.forEach(r => {
               const name = r['charity name'] || r['organisation'] || r['name'];
               if (!name) return;
-              const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(name));
+              const idx = newR.findIndex(m => cleanName(m.name) === cleanName(name));
               if (idx > -1) {
-                newReg[idx].loxo = r['loxo status'] === 'Client' ? 'Client' : newReg[idx].loxo;
-                newReg[idx].id = r['charity number'] || newReg[idx].id;
+                newR[idx].loxo = r['loxo status'] === 'Client' ? 'Client' : newR[idx].loxo;
+                newR[idx].id = r['charity number'] || newR[idx].id;
               } else {
-                newReg.push({ name, id: r['charity number'], loxo: r['loxo status'] || "Target" });
+                newR.push({ name, id: r['charity number'], loxo: r['loxo status'] || "Target" });
               }
             });
-            setRegistry(newReg);
-            localStorage.setItem('hub_registry', JSON.stringify(newReg));
-            addLog(`Registry mapped to ${newReg.length} targets.`);
+            setRegistry(newR);
+            localStorage.setItem('hub_registry', JSON.stringify(newR));
           }
         }
       };
@@ -173,18 +176,18 @@ export default function App() {
     });
   };
 
-  // --- CORE LOGIC ---
+  // --- BUSINESS LOGIC ---
   const runGrounding = async (charityName) => {
     if (!keys.gemini) { setActiveModal('settings'); return; }
     addLog(`Deep Grounding: ${charityName}...`);
-    const prompt = `Perform grounded search for vacancies at ${charityName}. 
-    1. Vacancy: Title, Salary, DIRECT SOURCE URL (Org website or CharityJob). 
-    2. Ad Tenure: Advertised Since? (Exact weeks/months). 
-    3. Hierarchy: Reports to who? Find Name AND Title. 
-    4. Gaps: Is legacy income < 5%? (Recommend consultancy). 
+    const prompt = `Perform grounded search for fundraising vacancies (>£40k) at ${charityName}. 
+    1. Opportunity: Title, Salary, DIRECT SOURCE URL. 
+    2. Ad Tenure: How long live? (>5 weeks = Priority). 
+    3. Hierarchy: Reports to who? Find Name and Title. 
+    4. Gaps: Is legacy income low? (Suggest consultancy). 
     5. Scoring: Grade A-F. 
     6. Email Guess: Use first.lastinitial@domain format.
-    Return strictly JSON: {"jobs": [{"title": "Role", "salary": "£50k", "link": "url", "since": "6 weeks", "reportsTo": "Name (Title)", "grade": "A", "type": "permanent|consultancy|gap", "behaviorFlag": "Pitch logic", "source": "CharityJob.co.uk"}]}`;
+    Return JSON: {"jobs": [{"title": "Role", "salary": "£50k", "link": "url", "since": "6 weeks", "reportsTo": "Name (Title)", "grade": "A", "type": "permanent|consultancy|gap", "behaviorFlag": "Pitch logic", "source": "Website"}]}`;
 
     try {
       const res = await fetch(`${API_URL}?key=${keys.gemini}`, {
@@ -195,12 +198,12 @@ export default function App() {
       const data = await res.json();
       const parsed = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text.replace(/```json/g, '').replace(/```/g, '').trim());
       if (parsed.jobs) {
-        const newIntel = [{ charityName, foundAt: new Date().toISOString(), jobs: parsed.jobs }, ...intel];
-        setIntel(newIntel);
-        localStorage.setItem('hub_intel', JSON.stringify(newIntel));
+        const newI = [{ charityName, foundAt: new Date().toISOString(), jobs: parsed.jobs }, ...intel];
+        setIntel(newI);
+        localStorage.setItem('hub_intel', JSON.stringify(newI));
         addLog(`Intelligence mapped for ${charityName}.`);
       }
-    } catch (e) { addLog("AI Handshake Error."); }
+    } catch (e) { addLog("AI Error."); }
   };
 
   const claimLead = (charityName, member) => {
@@ -208,10 +211,10 @@ export default function App() {
     const updated = { ...teamActions, [id]: { owner: member, date: new Date().toISOString() } };
     setTeamActions(updated);
     localStorage.setItem('hub_actions', JSON.stringify(updated));
-    addLog(`${member} claimed ${charityName}.`);
+    addLog(`${member} claimed lead: ${charityName}`);
   };
 
-  // --- REACTIVE STATS ---
+  // --- ANALYTICS ---
   const stats = useMemo(() => {
     const allJobs = intel.flatMap(i => i.jobs || []);
     return {
@@ -219,7 +222,7 @@ export default function App() {
       leads: allJobs.filter(j => j.type === 'permanent').length,
       consult: allJobs.filter(j => j.type === 'consultancy').length,
       gaps: allJobs.filter(j => j.type === 'gap').length,
-      links: connections.length
+      connected: connections.length
     };
   }, [registry, intel, connections]);
 
@@ -230,13 +233,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-blue-100 flex flex-col text-left">
-      {/* Universal Nav */}
+      {/* Universal Navbar */}
       <nav className="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center sticky top-0 z-[1000]">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 text-left">
           <Zap className="text-blue-600 fill-current" size={24} />
           <div>
             <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none">Intelligence Hub</h2>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none">Enterprise V19.4 PRO</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">Enterprise V19.6 PRO</p>
           </div>
         </div>
         
@@ -246,46 +249,46 @@ export default function App() {
             className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border ${isAdmin ? 'bg-slate-900 text-white border-slate-900' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-sm'}`}
           >
             {isAdmin ? <ShieldCheck size={14} /> : <Users size={14} />}
-            {isAdmin ? 'Admin Mode' : 'Colleague View'}
+            {isAdmin ? 'Admin mode' : 'Colleague view'}
           </button>
           {isAdmin && <button onClick={() => setActiveModal('settings')} className="text-slate-300 hover:text-slate-900 transition-colors"><Settings size={20} /></button>}
         </div>
       </nav>
 
       <main className="max-w-7xl mx-auto w-full p-8 flex-1">
-        {/* Metric Grid */}
+        {/* Metric Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm text-center">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1 leading-none">Global Map</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none block mb-1">Registry Map</span>
             <div className="text-4xl font-black text-slate-900 leading-none">{stats.registry}</div>
           </div>
           <button onClick={() => setActiveModal('gap')} className="bg-white p-6 rounded-[2.5rem] border border-emerald-100 shadow-sm hover:bg-emerald-50 transition-all text-center group">
-            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-1 leading-none">Income Gaps</span>
+            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-1 leading-none">Signal Gaps</span>
             <div className="text-4xl font-black text-emerald-600 leading-none">{stats.gaps}</div>
-            <span className="text-[7px] font-bold text-emerald-400 uppercase opacity-0 group-hover:opacity-100 transition-opacity italic">Legacy/F2F Mapping</span>
+            <span className="text-[7px] font-bold text-emerald-400 uppercase opacity-0 group-hover:opacity-100 transition-opacity italic">Legacy/F2F Analysis</span>
           </button>
           <button onClick={() => setActiveModal('permanent')} className="bg-white p-6 rounded-[2.5rem] border border-red-100 shadow-sm hover:bg-red-50 transition-all text-center group">
             <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-1 leading-none">Search Leads</span>
             <div className="text-4xl font-black text-red-600 leading-none">{stats.leads}</div>
-            <span className="text-[7px] font-bold text-red-400 uppercase opacity-0 group-hover:opacity-100 transition-opacity italic">Priority Open Desk</span>
+            <span className="text-[7px] font-bold text-red-400 uppercase opacity-0 group-hover:opacity-100 transition-opacity italic">Priority Desk</span>
           </button>
           <button onClick={() => setActiveModal('consultancy')} className="bg-white p-6 rounded-[2.5rem] border border-purple-100 shadow-sm hover:bg-purple-50 transition-all text-center group">
-            <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest block mb-1 leading-none">Interim</span>
+            <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest block mb-1 leading-none">Consultancy</span>
             <div className="text-4xl font-black text-purple-600 leading-none">{stats.consult}</div>
-            <span className="text-[7px] font-bold text-purple-400 uppercase opacity-0 group-hover:opacity-100 transition-opacity italic">Per-Day Discovery</span>
+            <span className="text-[7px] font-bold text-purple-400 uppercase opacity-0 group-hover:opacity-100 transition-opacity italic">Interim / Per-Day</span>
           </button>
         </div>
 
-        {/* Dashboard Area */}
+        {/* Work Surface */}
         <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-200 overflow-hidden mb-8">
           <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/30">
-            <div className="flex-1 max-w-md relative">
+            <div className="flex-1 max-w-md relative text-left">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Charities, Grades, or Warm Intro path..." 
+                placeholder="Search Organizations, Connections, or Grades..." 
                 className="w-full bg-white px-14 py-4 rounded-2xl border border-slate-200 outline-none text-sm font-medium focus:ring-4 ring-blue-50 transition-all"
               />
             </div>
@@ -294,11 +297,11 @@ export default function App() {
               <div className="flex items-center gap-3">
                 <label className="cursor-pointer bg-slate-900 text-white px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl flex items-center gap-2">
                   <Download size={14} />
-                  Sync Sequence 1-7
+                  Import Strategy Stack (1-7)
                   <input type="file" className="hidden" multiple accept=".csv" onChange={handleFileUpload} />
                 </label>
                 <button 
-                  onClick={() => addLog("Grounding all targets...")}
+                  onClick={() => addLog("Grounding strategy sweep initiated...")}
                   className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl flex items-center gap-2"
                 >
                   <Zap size={14} fill="currentColor" />
@@ -312,12 +315,12 @@ export default function App() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-white border-b border-slate-100">
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4">Organization Identity</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Leads & Potential Gaps</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Warm Path</th>
+                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4">Entity Details</th>
+                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Active search Leads / Signal Gaps</th>
+                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Warm path</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-50 text-left">
                 {filteredRegistry.slice(0, 50).map((c, i) => {
                   const discoveries = intel.filter(j => cleanName(j.charityName) === cleanName(c.name));
                   const latest = discoveries[0] || { jobs: [] };
@@ -335,7 +338,7 @@ export default function App() {
                             {c.loxo || 'Target'}
                           </span>
                           {school && <span className="urgency-badge bg-pink-100 text-pink-600 border-pink-200 flex items-center gap-1"><GraduationCap size={10} /> IDPE School</span>}
-                          {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200">CLAIMED: {action.owner}</span>}
+                          {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200">OWNED: {action.owner}</span>}
                         </div>
                       </td>
                       <td className="px-10 py-10">
@@ -350,13 +353,13 @@ export default function App() {
                               </div>
                             </div>
                           ))}
-                          {latest.jobs.length === 0 && <div className="text-[9px] text-slate-300 italic uppercase font-bold flex items-center gap-2"><Briefcase size={12} /> Waiting for intelligence sweep</div>}
+                          {latest.jobs.length === 0 && <div className="text-[9px] text-slate-300 italic uppercase font-bold flex items-center gap-2"><Briefcase size={12} /> No artifacts mapped</div>}
                         </div>
                       </td>
                       <td className="px-10 py-10 text-right">
                         {intro ? (
                           <div className="bg-blue-50 border border-blue-100 p-5 rounded-[2rem] inline-block text-left shadow-inner group hover:bg-blue-100 transition-all">
-                            <div className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1 italic flex items-center gap-1"><Link2 size={10} /> network connection</div>
+                            <div className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1 italic flex items-center gap-1"><Link2 size={10} /> Network contact</div>
                             <div className="text-[11px] font-black text-blue-900 uppercase tracking-tighter leading-none">{intro.name}</div>
                             <div className="text-[9px] font-bold text-blue-600 leading-tight italic mt-1">{intro.title}</div>
                           </div>
@@ -364,12 +367,12 @@ export default function App() {
                           <div className="flex flex-col items-end gap-3">
                              <select 
                                onChange={(e) => claimLead(c.name, e.target.value)}
-                               className="text-[11px] font-black border-2 border-slate-200 px-5 py-3 rounded-2xl bg-white outline-none focus:border-blue-600 transition-all uppercase tracking-tighter"
+                               className="text-[11px] font-black border-2 border-slate-200 px-5 py-3 rounded-2xl bg-white outline-none focus:border-blue-600 transition-all uppercase tracking-tighter cursor-pointer"
                              >
-                               <option>Claim As...</option>
+                               <option>Claim Lead...</option>
                                <option>Tim</option><option>Rory</option><option>Anton</option>
                              </select>
-                             <button onClick={() => runGrounding(c.name)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all flex items-center gap-2 px-2">Check Strategy <ChevronRight size={12} /></button>
+                             <button onClick={() => runGrounding(c.name)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all flex items-center gap-2 px-2">Ground Intelligence <ChevronRight size={12} /></button>
                           </div>
                         )}
                       </td>
@@ -381,7 +384,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* System Logs */}
+        {/* System Logs Area */}
         {isAdmin && (
           <div className="bg-slate-900 rounded-[2.5rem] p-8 text-slate-500 font-mono text-[10px] leading-relaxed mb-20 shadow-2xl text-left border border-white/5">
             <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
@@ -402,8 +405,8 @@ export default function App() {
         <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[6000] flex items-center justify-center p-6 text-center">
           <div className="bg-white rounded-[3.5rem] shadow-2xl max-w-md w-full p-12 text-left">
             <div className="flex justify-center mb-6"><Settings size={32} className="text-blue-600" /></div>
-            <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center leading-none">Security Core</h3>
-            <p className="text-[10px] font-bold text-slate-400 mb-8 text-center uppercase tracking-widest">Connect discovery engines to CRM deployment</p>
+            <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center leading-none">Security handshakes</h3>
+            <p className="text-[10px] font-bold text-slate-400 mb-8 text-center uppercase tracking-widest">Setup discovery engines and CRM Bridge</p>
             <div className="space-y-6">
               <div>
                 <label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest">Gemini API Pro</label>
@@ -424,39 +427,39 @@ export default function App() {
                 localStorage.setItem('hub_loxo_key', keys.loxo);
                 localStorage.setItem('hub_cc_key', keys.cc);
                 setActiveModal(null);
-                addLog("Security handshake finalized.");
+                addLog("Security keys finalized.");
               }}
               className="w-full bg-blue-600 text-white py-6 rounded-2xl font-black uppercase italic shadow-2xl mt-10 hover:bg-blue-700 transition-all active:scale-95"
             >
-              Verify Deployment
+              Verify Keys
             </button>
           </div>
         </div>
       )}
 
-      {/* Leads Desk Modals */}
+      {/* Intelligence Desk Modals */}
       {activeModal && activeModal !== 'settings' && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[5000] p-4 md:p-10 flex items-center justify-center">
+        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[5000] p-4 md:p-10 flex items-center justify-center text-left">
           <div className="bg-white rounded-[4rem] shadow-2xl w-full h-full max-w-6xl flex flex-col overflow-hidden relative border border-white/20">
              <button onClick={() => setActiveModal(null)} className="absolute top-8 right-8 p-4 bg-slate-100 rounded-full hover:bg-slate-200 transition-all z-[10] shadow-sm"><X size={20} className="text-slate-900" /></button>
              <div className="p-10 border-b border-slate-100 bg-slate-50/50">
-                <h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">
-                  {activeModal === 'gap' ? 'Proactive Gap Analysis' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active search Intel'}
+                <h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">
+                  {activeModal === 'gap' ? 'Proactive Gap Analysis' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active Intelligence List'}
                 </h2>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Strategic discovery for targeted agency outreach</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic">Strategic mapping for agency targeting</p>
              </div>
              <div className="flex-1 overflow-auto custom-scrollbar p-10">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b border-slate-200">
+                    <tr className="border-b border-slate-200 text-left">
                       <th className="py-4 text-[10px] font-black uppercase text-slate-400">Organization</th>
-                      <th className="py-4 text-[10px] font-black uppercase text-slate-400">Target Role / manager</th>
+                      <th className="py-4 text-[10px] font-black uppercase text-slate-400">Vacancy / Manager</th>
                       <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-center">Priority</th>
-                      <th className="py-4 text-[10px] font-black uppercase text-slate-400">Strategic outreach Narrative</th>
-                      <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-right">Loxo Sync</th>
+                      <th className="py-4 text-[10px] font-black uppercase text-slate-400">Pitch Narrative</th>
+                      <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-right">Owner / Sync</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 text-left">
                     {intel.flatMap(entry => entry.jobs.filter(job => job.type === activeModal).map((l, i) => {
                       const actionId = entry.charityName.replace(/[^a-zA-Z0-9]/g, "-");
                       const isClaimed = !!teamActions[actionId];
@@ -464,7 +467,7 @@ export default function App() {
                         <tr key={i} className={`group ${isClaimed ? 'opacity-40 grayscale' : ''}`}>
                           <td className="py-6 font-black uppercase text-[12px] text-slate-900 leading-tight">{entry.charityName}</td>
                           <td className="py-6 text-left">
-                            <div className="font-bold text-[10px] text-blue-600 uppercase tracking-tighter italic leading-none">{l.title}</div>
+                            <div className="font-bold text-[10px] text-blue-600 uppercase tracking-tighter leading-none mb-1">{l.title}</div>
                             <div className="text-[8px] font-bold text-slate-500 uppercase italic mt-1 leading-none">Mgr: {l.reportsTo || 'Unknown'}</div>
                             <div className="text-[7px] font-black text-slate-400 uppercase italic mt-1 leading-none">Source: {l.source || 'Direct'}</div>
                           </td>
@@ -473,7 +476,7 @@ export default function App() {
                           </td>
                           <td className="py-6 max-w-sm text-[10px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-6 text-left">
                             {l.behaviorFlag}
-                            <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-wider">Advertised Since: {l.since}</div>
+                            <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-wider">Live Since: {l.since}</div>
                           </td>
                           <td className="py-6 text-right">
                             <div className="flex items-center justify-end gap-2">
@@ -481,7 +484,7 @@ export default function App() {
                                 <ExternalLink size={16} className="text-slate-400" />
                               </a>
                               {isClaimed ? (
-                                <div className="text-[8px] font-black text-emerald-600 uppercase italic bg-emerald-50 px-3 py-2 rounded-xl">In Pipeline: {teamActions[actionId].owner}</div>
+                                <div className="text-[8px] font-black text-emerald-600 uppercase italic bg-emerald-50 px-3 py-2 rounded-xl">Claimed by {teamActions[actionId].owner}</div>
                               ) : (
                                 <button onClick={() => claimLead(entry.charityName, 'Tim')} className="bg-blue-600 text-white text-[9px] font-black px-5 py-2.5 rounded-2xl uppercase shadow-xl hover:bg-blue-700 active:scale-95 transition-all">Sync to Loxo</button>
                               )}
