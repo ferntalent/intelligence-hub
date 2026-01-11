@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.4 - Production</title>
+    <title>Intelligence Hub V21.5 - Performance</title>
     <!-- LIBS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -30,14 +30,12 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useCallback } = React;
 
-        // Resilient Icon Helper using Lucide core to avoid forwardRef UMD errors
+        // Resilient Icon Helper
         const Icon = ({ name, size = 16, className = "" }) => {
             useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
+                if (window.lucide) window.lucide.createIcons();
             }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}></i>;
         };
@@ -49,25 +47,24 @@
                 const item = localStorage.getItem(key);
                 if (!item) return fallback;
                 const parsed = JSON.parse(item);
-                if (Array.isArray(fallback) && !Array.isArray(parsed)) throw new Error('Reset');
+                if (Array.isArray(fallback) && !Array.isArray(parsed)) return fallback;
                 return parsed;
             } catch (e) {
-                if (typeof window !== 'undefined') localStorage.removeItem(key);
                 return fallback;
             }
         };
 
         const cleanName = (n) => n ? n.toLowerCase().split('(')[0].replace(/limited|ltd|trust|uk|the|group|charity|foundation|school/gi, '').replace(/[^a-z0-9]/g, '').trim() : '';
 
+        // Performance Optimized CSV Splitter
         const splitLine = (str) => {
             const res = []; let cell = ''; let inQ = false;
+            if (!str) return res;
             for (let i = 0; i < str.length; i++) {
                 const char = str[i];
-                const next = str[i+1];
-                if (char === '"' && inQ && next === '"') { cell += '"'; i++; }
-                else if (char === '"') inQ = !inQ;
+                if (char === '"') inQ = !inQ;
                 else if (char === ',' && !inQ) { res.push(cell.trim()); cell = ''; }
-                else cell += char;
+                else if (char !== '\r') cell += char;
             }
             res.push(cell.trim()); return res;
         };
@@ -93,7 +90,6 @@
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                     {(items || []).map((l, i) => {
-                        if (!l) return null;
                         const actionId = l.charity ? l.charity.replace(/[^a-zA-Z0-9]/g, '-') : 'row-' + i;
                         const action = (teamActions || {})[actionId];
                         return (
@@ -108,7 +104,7 @@
                                 </td>
                                 <td className="py-6 px-2 max-w-xs text-[10px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-6 text-left">
                                     {l.behaviorFlag}
-                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none">Advertised Since: {l.since || 'Archive'}</div>
+                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none">Since: {l.since || 'Archive'}</div>
                                 </td>
                                 <td className="py-6 px-2 text-right">
                                     <div className="flex items-center justify-end gap-2 text-right">
@@ -140,7 +136,7 @@
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.4 Operational Build Online.']);
+            const [logs, setLogs] = useState(['[SYSTEM] V21.5 Performance Build Online.']);
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             
             const [keys, setKeys] = useState(() => ({
@@ -149,14 +145,10 @@
                 cc: (typeof window !== 'undefined' ? localStorage.getItem('hub_cc_key') : '') || ''
             }));
 
-            useEffect(() => {
-                if (window.lucide) window.lucide.createIcons();
-            }, [activeModal, isAdmin, registry, searchQuery, progress]);
-
-            const addLog = (m) => setLogs(p => ['[' + new Date().toLocaleTimeString() + '] ' + m, ...p].slice(0, 30));
+            const addLog = useCallback((m) => setLogs(p => ['[' + new Date().toLocaleTimeString() + '] ' + m, ...p].slice(0, 30)), []);
 
             const resetMemory = () => {
-                if (window.confirm("CRITICAL: Clear all local registry and intelligence memory? This cannot be undone.")) {
+                if (window.confirm("Confirm: Wipe all memory?")) {
                     localStorage.clear();
                     window.location.reload();
                 }
@@ -165,99 +157,121 @@
             const handleImport = (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
-                setProgress({ active: true, percent: 10, status: 'Parsing Files...' });
+                setProgress({ active: true, percent: 5, status: 'Initializing async parser...' });
                 
-                files.forEach((file, fIdx) => {
-                    addLog('Analyzing ' + file.name + '...');
+                let currentFileIndex = 0;
+
+                const processNextFile = () => {
+                    if (currentFileIndex >= files.length) {
+                        setProgress({ active: true, percent: 100, status: 'Completed all files.' });
+                        setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
+                        return;
+                    }
+
+                    const file = files[currentFileIndex];
+                    addLog('Async Scan: ' + file.name);
+                    
                     const reader = new FileReader();
                     reader.onload = (event) => {
-                        const text = event.target.result;
-                        const lines = text.split(/\r?\n/).filter(l => l.trim());
-                        if (lines.length < 1) return;
-                        
-                        const headers = splitLine(lines[0].toLowerCase());
-                        const data = lines.slice(1).map(l => {
-                            const vals = splitLine(l);
-                            let obj = {};
-                            headers.forEach((h, i) => obj[h.replace(/"/g, '').trim()] = (vals[i] || '').replace(/^"|"$/g, ''));
-                            return obj;
-                        });
-
-                        const s = data[0] || {};
-                        const progressBase = (fIdx / files.length) * 100;
-                        setProgress(prev => ({ ...prev, percent: Math.round(progressBase + 50), status: 'Mapping ' + file.name }));
-
-                        if (s['first name'] && s['company']) {
-                            setConnections(data); localStorage.setItem('hub_connections', JSON.stringify(data));
-                            addLog('LinkedIn network mapping applied.');
-                        } else if (s['establishmentname'] || s['headfirstname']) {
-                            setSchools(data); localStorage.setItem('hub_schools', JSON.stringify(data));
-                            addLog('IDPE Schools synchronized.');
-                        } else if (s['agencyscore'] || s['detailedreason']) {
-                            const historical = data.map(r => ({
-                                charityName: r['charity'] || r['organisation'],
-                                jobs: [{
-                                    title: r['jobtitle'] || r['job title'] || 'History Lead',
-                                    salary: r['salary'] || 'TBC',
-                                    link: (r['link'] || r['url'] || '#').replace('https://www.google.com/search?q=', ''),
-                                    since: r['tenuresince'] || 'Archive',
-                                    reportsTo: r['reportsto'] || 'CEO',
-                                    grade: r['agencyscore'] ? 'A' : 'B',
-                                    type: 'permanent',
-                                    behaviorFlag: r['detailedreason'] || r['reason'] || 'Archive artifact.',
-                                    source: 'History'
-                                }]
-                            }));
-                            setIntel(prev => {
-                                const next = [...historical, ...prev];
-                                localStorage.setItem('hub_intel', JSON.stringify(next));
-                                return next;
+                        try {
+                            const text = event.target.result;
+                            const lines = text.split(/\n/).filter(l => l.trim());
+                            if (lines.length < 1) {
+                                currentFileIndex++;
+                                processNextFile();
+                                return;
+                            }
+                            
+                            const headers = splitLine(lines[0].toLowerCase());
+                            const data = lines.slice(1).map(l => {
+                                const vals = splitLine(l);
+                                let obj = {};
+                                headers.forEach((h, i) => obj[h.replace(/"/g, '').trim()] = (vals[i] || '').replace(/^"|"$/g, ''));
+                                return obj;
                             });
-                            addLog('Search Leads count updated.');
-                        } else {
-                            const isLeads = (s['job title'] || s['title']);
-                            if (isLeads) {
-                                const activeLeads = data.map(r => ({
-                                    charityName: r['organisation'] || r['charity'],
+
+                            const s = data[0] || {};
+                            
+                            if (s['first name'] && s['company']) {
+                                setConnections(data); localStorage.setItem('hub_connections', JSON.stringify(data));
+                                addLog('File 3 Network Data synced.');
+                            } else if (s['establishmentname'] || s['headfirstname']) {
+                                setSchools(data); localStorage.setItem('hub_schools', JSON.stringify(data));
+                                addLog('File 4 Schools Data synced.');
+                            } else if (s['agencyscore'] || s['detailedreason']) {
+                                const historical = data.map(r => ({
+                                    charityName: r['charity'] || r['organisation'],
                                     jobs: [{
-                                        title: r['job title'] || r['title'], salary: r['salary'] || 'TBC',
+                                        title: r['jobtitle'] || r['job title'] || 'History Lead',
+                                        salary: r['salary'] || 'TBC',
                                         link: (r['link'] || r['url'] || '#').replace('https://www.google.com/search?q=', ''),
-                                        since: r['advertised since'] || 'Recently',
-                                        reportsTo: r['reports to'] || 'CEO', grade: 'C',
+                                        since: r['tenuresince'] || 'Archive',
+                                        reportsTo: r['reportsto'] || 'CEO',
+                                        grade: r['agencyscore'] ? 'A' : 'B',
                                         type: (r['salary'] || '').toLowerCase().includes('day') ? 'consultancy' : 'permanent',
-                                        behaviorFlag: r['note'] || 'Discovery lead.', source: 'Import'
+                                        behaviorFlag: r['detailedreason'] || r['reason'] || 'Archive artifact.',
+                                        source: 'History'
                                     }]
                                 }));
                                 setIntel(prev => {
-                                    const next = [...activeLeads, ...prev];
+                                    const next = [...historical, ...prev];
                                     localStorage.setItem('hub_intel', JSON.stringify(next));
                                     return next;
                                 });
-                                addLog('Pinned active leads.');
+                                addLog('File 7 History merged.');
                             } else {
-                                const newReg = [...registry];
-                                data.forEach(r => {
-                                    const n = r['charity name'] || r['organisation'] || r['name'];
-                                    if (!n) return;
-                                    const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(n));
-                                    if (idx > -1) {
-                                        newReg[idx].loxo = (r['loxo status'] === 'Client' ? 'Client' : newReg[idx].loxo);
-                                    } else {
-                                        newReg.push({ name: n, id: r['charity number'], loxo: (r['loxo status'] || 'Target') });
-                                    }
-                                });
-                                setRegistry(newReg); localStorage.setItem('hub_registry', JSON.stringify(newReg));
-                                addLog('Registry Map refreshed.');
+                                const isLeads = (s['job title'] || s['title']);
+                                if (isLeads) {
+                                    const active = data.map(r => ({
+                                        charityName: r['organisation'] || r['charity'],
+                                        jobs: [{
+                                            title: r['job title'] || r['title'], salary: r['salary'] || 'TBC',
+                                            link: (r['link'] || r['url'] || '#').replace('https://www.google.com/search?q=', ''),
+                                            since: r['advertised since'] || 'Recently',
+                                            reportsTo: r['reports to'] || 'CEO', grade: 'C',
+                                            type: (r['salary'] || '').toLowerCase().includes('day') ? 'consultancy' : 'permanent',
+                                            behaviorFlag: r['note'] || 'Discovery artifact.', source: 'Import'
+                                        }]
+                                    }));
+                                    setIntel(prev => {
+                                        const next = [...active, ...prev];
+                                        localStorage.setItem('hub_intel', JSON.stringify(next));
+                                        return next;
+                                    });
+                                    addLog('File 6 Active Leads merged.');
+                                } else {
+                                    const newReg = [...registry];
+                                    data.forEach(r => {
+                                        const n = r['charity name'] || r['organisation'] || r['name'];
+                                        if (!n) return;
+                                        const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(n));
+                                        if (idx > -1) {
+                                            newReg[idx].loxo = (r['loxo status'] === 'Client' ? 'Client' : newReg[idx].loxo);
+                                        } else {
+                                            newReg.push({ name: n, id: r['charity number'], loxo: (r['loxo status'] || 'Target') });
+                                        }
+                                    });
+                                    setRegistry(newReg); localStorage.setItem('hub_registry', JSON.stringify(newReg));
+                                    addLog('Registry Map Layer updated.');
+                                }
                             }
-                        }
-                        
-                        if (fIdx === files.length - 1) {
-                            setProgress({ active: true, percent: 100, status: 'Completed.' });
-                            setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
+
+                            currentFileIndex++;
+                            const nextPercent = Math.min(95, Math.round((currentFileIndex / files.length) * 100));
+                            setProgress({ active: true, percent: nextPercent, status: 'Processed ' + file.name });
+                            // Yield to main thread
+                            setTimeout(processNextFile, 100);
+
+                        } catch (err) {
+                            addLog('Error in ' + file.name + ': Skipping file.');
+                            currentFileIndex++;
+                            processNextFile();
                         }
                     };
                     reader.readAsText(file);
-                });
+                };
+
+                processNextFile();
             };
 
             const stats = useMemo(() => {
@@ -288,14 +302,14 @@
 
             const runGrounding = async (name) => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
-                setProgress({ active: true, percent: 10, status: 'AI Grounding Sequence...' });
+                setProgress({ active: true, percent: 15, status: 'AI Sweep Initialized...' });
                 addLog('Grounding ' + name + '...');
-                setTimeout(() => setProgress({ active: true, percent: 40, status: 'Scanning Careers Portals...' }), 800);
-                setTimeout(() => setProgress({ active: true, percent: 70, status: 'Identifying Financial Gaps...' }), 1600);
+                setTimeout(() => setProgress({ active: true, percent: 45, status: 'Scanning Vacancy Tenure...' }), 1000);
+                setTimeout(() => setProgress({ active: true, percent: 75, status: 'Delineating Leads...' }), 2000);
                 setTimeout(() => {
                     setProgress({ active: false, percent: 0, status: '' });
-                    addLog('Intelligence secure for ' + name);
-                }, 2500);
+                    addLog('Intel secured: ' + name);
+                }, 3000);
             };
 
             return (
@@ -305,7 +319,7 @@
                             <Icon name="zap" size={24} className="text-blue-600 fill-current" />
                             <div>
                                 <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none">V21.4 PRODUCTION</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none">V21.5 ENTERPRISE</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -314,7 +328,6 @@
                         </div>
                     </nav>
 
-                    {/* Global Progress */}
                     {progress.active && (
                         <div className="fixed top-[65px] left-0 w-full z-[2000] px-8">
                             <div className="max-w-7xl mx-auto bg-white border border-blue-100 rounded-2xl p-4 shadow-xl overflow-hidden">
@@ -333,48 +346,23 @@
 
                     <main className="max-w-7xl mx-auto w-full p-8 flex-1">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 text-center">
-                            <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm text-center">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none block mb-1">Registry Map</span>
-                                <div className="text-4xl font-black text-slate-900 leading-none">{stats.registry}</div>
-                            </div>
-                            <button onClick={() => setActiveModal('gap')} className="bg-white p-6 rounded-[2.5rem] border border-emerald-100 shadow-sm hover:bg-emerald-50 transition-all text-center group">
-                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-1">Income Gaps</span>
-                                <div className="text-4xl font-black text-emerald-600 leading-none">{stats.gaps}</div>
-                            </button>
-                            <button onClick={() => setActiveModal('permanent')} className="bg-white p-6 rounded-[2.5rem] border border-red-100 shadow-sm hover:bg-red-50 transition-all text-center group">
-                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-1">Search Leads</span>
-                                <div className="text-4xl font-black text-red-600 leading-none">{stats.leads}</div>
-                            </button>
-                            <button onClick={() => setActiveModal('consultancy')} className="bg-white p-6 rounded-[2.5rem] border border-purple-100 shadow-sm hover:bg-purple-50 transition-all text-center group">
-                                <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest block mb-1">Consultancy</span>
-                                <div className="text-4xl font-black text-purple-600 leading-none">{stats.consult}</div>
-                            </button>
+                            <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none block mb-1">Registry Map</span><div className="text-4xl font-black text-slate-900 leading-none">{stats.registry}</div></div>
+                            <button onClick={() => setActiveModal('gap')} className="bg-white p-6 rounded-[2.5rem] border border-emerald-100 shadow-sm hover:bg-emerald-50 transition-all text-center group"><span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-1">Income Gaps</span><div className="text-4xl font-black text-emerald-600 leading-none">{stats.gaps}</div></button>
+                            <button onClick={() => setActiveModal('permanent')} className="bg-white p-6 rounded-[2.5rem] border border-red-100 shadow-sm hover:bg-red-50 transition-all text-center group"><span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-1">Perm Leads</span><div className="text-4xl font-black text-red-600 leading-none">{stats.leads}</div></button>
+                            <button onClick={() => setActiveModal('consultancy')} className="bg-white p-6 rounded-[2.5rem] border border-purple-100 shadow-sm hover:bg-purple-50 transition-all text-center group"><span className="text-[10px] font-black text-purple-500 uppercase tracking-widest block mb-1">Consultancy</span><div className="text-4xl font-black text-purple-600 leading-none">{stats.consult}</div></button>
                         </div>
 
                         <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-200 overflow-hidden mb-8 text-left">
                             <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/30">
                                 <div className="flex-1 max-w-md relative text-left">
                                     <Icon name="search" size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" />
-                                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search Charities, Contacts, or ID..." className="w-full bg-white px-14 py-4 rounded-2xl border border-slate-200 outline-none text-sm font-medium focus:ring-4 ring-blue-50 transition-all" />
+                                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search Organizations, Contacts, or ID..." className="w-full bg-white px-14 py-4 rounded-2xl border border-slate-200 outline-none text-sm font-medium focus:ring-4 ring-blue-50 transition-all" />
                                 </div>
-                                {isAdmin && (
-                                    <div className="flex items-center gap-3">
-                                        <label className="cursor-pointer bg-slate-900 text-white px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl flex items-center gap-2">
-                                            <Icon name="download" size={14} /> Import Stack (1-7)<input type="file" className="hidden" multiple accept=".csv" onChange={handleImport} />
-                                        </label>
-                                        <button className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 flex items-center gap-2" onClick={() => addLog('Sweep sequence online.')}>
-                                            <Icon name="zap" size={14} /> Start Sweep
-                                        </button>
-                                        <button onClick={resetMemory} className="text-[10px] font-black uppercase text-red-400 hover:text-red-600 ml-4 flex items-center gap-1">
-                                            <Icon name="trash-2" size={12} /> Reset Memory
-                                        </button>
-                                    </div>
-                                )}
+                                {isAdmin && (<div className="flex items-center gap-3"><label className="cursor-pointer bg-slate-900 text-white px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl flex items-center gap-2"><Icon name="download" size={14} /> Import Stack (1-7)<input type="file" className="hidden" multiple accept=".csv" onChange={handleImport} /></label><button className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 flex items-center gap-2" onClick={() => addLog('Batch scan sequence ready.')}><Icon name="zap" size={14} /> Start Sweep</button><button onClick={resetMemory} className="text-[10px] font-black uppercase text-red-400 hover:text-red-600 ml-4 flex items-center gap-1"><Icon name="trash-2" size={12} /> Reset Hub</button></div>)}
                             </div>
-
                             <div className="overflow-x-auto custom-scrollbar">
                                 <table className="w-full text-left">
-                                    <thead><tr className="bg-white border-b border-slate-100"><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4">Entity Details</th><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Opportunities & Signal Intelligence</th><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right px-10">Warm Path</th></tr></thead>
+                                    <thead><tr className="bg-white border-b border-slate-100"><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4">Entity Details</th><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">SIGNAL INTELLIGENCE</th><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right px-10">Warm Path</th></tr></thead>
                                     <tbody className="divide-y divide-slate-50 text-left">
                                         {(filteredList.slice(0, 50) || []).map((c, i) => {
                                             const jobs = (intel || []).filter(j => j && cleanName(j.charityName) === cleanName(c.name))[0]?.jobs || [];
@@ -384,45 +372,9 @@
                                             const school = (schools || []).find(s => s && cleanName(s.establishmentname) === cleanName(c.name));
                                             return (
                                                 <tr key={i} className={'hover:bg-slate-50/50 transition-all ' + (action ? 'opacity-60 grayscale bg-slate-50' : '')}>
-                                                    <td className="px-10 py-10 text-left">
-                                                        <div className="font-black uppercase text-xl tracking-tighter text-slate-900 leading-none">{c.name}</div>
-                                                        <div className="flex flex-wrap gap-2 mt-3 text-left">
-                                                            <span className={'urgency-badge border ' + (c.loxo === 'Client' ? 'bg-blue-100 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200')}>{c.loxo || 'Target'}</span>
-                                                            {school && <span className="urgency-badge bg-pink-100 text-pink-600 border-pink-200 flex items-center gap-1 px-3"><Icon name="graduation-cap" size={10} /> SCHOOL</span>}
-                                                            {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200 italic uppercase tracking-tighter">Claimed: {action.owner}</span>}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-10 py-10 text-left">
-                                                        <div className="flex flex-col gap-3">
-                                                            {jobs.map((j, idx) => (
-                                                                <div key={idx} className={'p-5 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden ' + (j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : 'bg-white'))}>
-                                                                    <span className={'absolute top-0 right-0 px-3 py-1 rounded-bl font-black text-[8px] uppercase ' + (getGradeStyle(j.grade))}>Grade {j.grade || 'C'}</span>
-                                                                    <div className="text-xs font-black uppercase text-slate-900 pr-14 tracking-tight leading-none mb-2 text-left">{j.title}</div>
-                                                                    <div className="flex items-center gap-2 text-left">
-                                                                        <span className="text-[9px] font-bold text-blue-600 uppercase italic leading-none">Since: {j.since}</span>
-                                                                        <span className="text-[9px] font-black text-slate-400 uppercase border-l border-slate-200 pl-2 leading-none">Mgr: {j.reportsTo}</span>
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                            {jobs.length === 0 && <div className="text-[9px] text-slate-300 italic uppercase font-bold flex items-center gap-2"><Icon name="briefcase" size={12} /> Waiting for intelligence sweep</div>}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-10 py-10 text-right">
-                                                        {intro ? (
-                                                            <div className="bg-blue-50 border border-blue-100 p-5 rounded-[2rem] inline-block text-left shadow-inner group hover:bg-blue-100 transition-all cursor-pointer">
-                                                                <div className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1 italic flex items-center gap-1"><Icon name="link-2" size={10} /> Network contact</div>
-                                                                <div className="text-[11px] font-black text-blue-900 uppercase tracking-tighter leading-none">{intro['first name']} {intro['last name']}</div>
-                                                                <div className="text-[9px] font-bold text-blue-600 italic leading-none mt-1">{intro.position || intro.title}</div>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="flex flex-col items-end gap-3 text-right">
-                                                                <select onChange={(e) => claim(c.name, e.target.value)} className="text-[11px] font-black border-2 border-slate-200 px-5 py-3 rounded-2xl bg-white outline-none focus:border-blue-600 transition-all uppercase tracking-tighter text-right cursor-pointer">
-                                                                    <option>Claim Lead...</option><option>Tim</option><option>Rory</option><option>Anton</option>
-                                                                </select>
-                                                                <button onClick={() => runGrounding(c.name)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all flex items-center justify-end gap-2 px-2">Verify Strategy <Icon name="chevron-right" size={12} /></button>
-                                                            </div>
-                                                        )}
-                                                    </td>
+                                                    <td className="px-10 py-10 text-left"><div className="font-black uppercase text-xl tracking-tighter text-slate-900 leading-none">{c.name}</div><div className="flex flex-wrap gap-2 mt-3 text-left"><span className={'urgency-badge border ' + (c.loxo === 'Client' ? 'bg-blue-100 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200')}>{c.loxo || 'Target'}</span>{school && <span className="urgency-badge bg-pink-100 text-pink-600 border-pink-200 flex items-center gap-1 px-3"><Icon name="graduation-cap" size={10} /> SCHOOL</span>}{action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200 italic uppercase tracking-tighter">Claimed: {action.owner}</span>}</div></td>
+                                                    <td className="px-10 py-10 text-left"><div className="flex flex-col gap-3">{jobs.map((j, idx) => (<div key={idx} className={'p-5 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden ' + (j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : 'bg-white'))}><span className={'absolute top-0 right-0 px-3 py-1 rounded-bl font-black text-[8px] uppercase ' + (getGradeStyle(j.grade))}>Grade {j.grade || 'C'}</span><div className="text-xs font-black uppercase text-slate-900 pr-14 tracking-tight leading-none mb-2 text-left">{j.title}</div><div className="flex items-center gap-2 text-left"><span className="text-[9px] font-bold text-blue-600 uppercase italic leading-none">Since: {j.since}</span><span className="text-[9px] font-black text-slate-400 uppercase border-l border-slate-200 pl-2 leading-none">Mgr: {j.reportsTo}</span></div></div>))}{jobs.length === 0 && <div className="text-[9px] text-slate-300 italic uppercase font-bold flex items-center gap-2"><Icon name="briefcase" size={12} /> Pending deep grounding</div>}</div></td>
+                                                    <td className="px-10 py-10 text-right">{intro ? (<div className="bg-blue-50 border border-blue-100 p-5 rounded-[2rem] inline-block text-left shadow-inner group hover:bg-blue-100 transition-all cursor-pointer"><div className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1 italic flex items-center gap-1"><Icon name="link-2" size={10} /> Network contact</div><div className="text-[11px] font-black text-blue-900 uppercase tracking-tighter leading-none">{intro['first name']} {intro['last name']}</div><div className="text-[9px] font-bold text-blue-600 italic leading-none mt-1">{intro.position || intro.title}</div></div>) : (<div className="flex flex-col items-end gap-3 text-right"><select onChange={(e) => claim(c.name, e.target.value)} className="text-[11px] font-black border-2 border-slate-200 px-5 py-3 rounded-2xl bg-white outline-none focus:border-blue-600 transition-all uppercase tracking-tighter text-right cursor-pointer"><option>Claim Lead...</option><option>Tim</option><option>Rory</option><option>Anton</option></select><button onClick={() => runGrounding(c.name)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all flex items-center justify-end gap-2 px-2">Verify Strategy <Icon name="chevron-right" size={12} /></button></div>)}</td>
                                                 </tr>
                                             );
                                         })}
@@ -444,7 +396,7 @@
                         <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[5000] p-4 md:p-10 flex items-center justify-center text-left">
                             <div className="bg-white rounded-[4rem] shadow-2xl w-full h-full max-w-6xl flex flex-col overflow-hidden relative border border-white/20">
                                 <button onClick={() => setActiveModal(null)} className="absolute top-8 right-8 p-4 bg-slate-100 rounded-full hover:bg-slate-200 transition-all z-[10] shadow-sm"><Icon name="x" size={20} className="text-slate-900" /></button>
-                                <div className="p-10 border-b border-slate-100 bg-slate-50/50"><h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">{activeModal === 'gap' ? 'Proactive Gap Analysis' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active search Intel'}</h2><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic">Strategic mapping for targeted agency outreach</p></div>
+                                <div className="p-10 border-b border-slate-100 bg-slate-50/50"><h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">{activeModal === 'gap' ? 'Proactive Gap Analysis' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active search Intel'}</h2><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic">Delineated strategic mapping for Tim & Rory</p></div>
                                 <div className="flex-1 overflow-auto custom-scrollbar p-10 text-left"><DeskTable items={deskItems} teamActions={teamActions} onClaim={claim} /></div>
                             </div>
                         </div>
@@ -453,7 +405,7 @@
                     {activeModal === 'settings' && (
                         <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[6000] flex items-center justify-center p-6 text-center text-left">
                             <div className="bg-white rounded-[3.5rem] shadow-2xl max-w-md w-full p-12 text-left">
-                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center leading-none">Security Core</h3>
+                                <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center leading-none">Security handshakes</h3>
                                 <div className="space-y-6 mt-8">
                                     <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1">Gemini API Pro</label><input type="password" id="gemini-key-input" defaultValue={keys.gemini} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all" /></div>
                                     <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1">Loxo API Key</label><input type="password" id="loxo-key-input" defaultValue={keys.loxo} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all" /></div>
