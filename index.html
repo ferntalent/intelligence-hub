@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.17 - Systematic Orchestrator</title>
+    <title>Intelligence Hub V21.18 - Systematic Orchestrator</title>
     <!-- LIBS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -24,17 +24,26 @@
         .gap-card { border-left: 4px solid #10b981; background-color: #f0fdf4; }
         .progress-shimmer { background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        #boot-loader { position: fixed; inset: 0; background: #f8fafc; display: flex; align-items: center; justify-content: center; z-index: 99999; }
     </style>
 </head>
 <body class="p-4 md:p-8 text-left">
+    <!-- Fallback Loader -->
+    <div id="boot-loader" class="font-black text-slate-400 uppercase tracking-widest text-[10px] italic animate-pulse">
+        Initializing Intelligence Hub...
+    </div>
+
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback } = React;
 
+        // Resilient Icon Helper
         const Icon = ({ name, size = 16, className = "" }) => {
             useEffect(() => {
-                if (window.lucide) window.lucide.createIcons();
+                if (window.lucide) {
+                    try { window.lucide.createIcons(); } catch (e) {}
+                }
             }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}></i>;
         };
@@ -48,6 +57,7 @@
                 const item = localStorage.getItem(key);
                 if (!item) return fallback;
                 const parsed = JSON.parse(item);
+                if (!parsed) return fallback; // Handle null/empty from parse
                 if (Array.isArray(fallback) && !Array.isArray(parsed)) return fallback;
                 return parsed;
             } catch (e) { return fallback; }
@@ -88,6 +98,7 @@
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                     {(items || []).map((l, i) => {
+                        if (!l) return null;
                         const actionId = l.charity ? l.charity.replace(/[^a-zA-Z0-9]/g, '-') : 'row-' + i;
                         const action = (teamActions || {})[actionId];
                         return (
@@ -98,7 +109,7 @@
                                         <span className="text-[7px] text-blue-500 font-bold uppercase">{l.cause || 'Sector'}</span>
                                         <span className="text-[7px] text-slate-400 font-bold uppercase border-l border-slate-200 pl-1">{l.location || 'UK HQ'}</span>
                                     </div>
-                                    <div className="text-[7px] text-slate-300 font-bold mt-1 uppercase italic">System Trace: {l.auditDate || 'New'}</div>
+                                    <div className="text-[7px] text-slate-300 font-bold mt-1 uppercase italic">Audit: {l.auditDate || 'New Discovery'}</div>
                                 </td>
                                 <td className="py-6 px-2">
                                     <div className="font-bold text-[11px] text-blue-600 uppercase italic leading-none">{l.title}</div>
@@ -154,11 +165,11 @@
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.17 Orchestrator Ready. Queue logic active.']);
+            const [logs, setLogs] = useState(['[SYSTEM] V21.18 Stability Build Active.']);
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             const [emailInput, setEmailInput] = useState('');
 
-            const [leadFilters, setLeadFilters] = useState({ cause: 'all', salary: 'all', location: 'all' });
+            const [leadFilters, setLeadFilters] = useState({ cause: 'all', location: 'all' });
             
             const [keys, setKeys] = useState(() => ({
                 gemini: (typeof window !== 'undefined' ? localStorage.getItem('hub_gemini_key') : '') || '',
@@ -166,10 +177,24 @@
                 cc: (typeof window !== 'undefined' ? localStorage.getItem('hub_cc_key') : '') || ""
             }));
 
+            // Sync with localstorage after state updates to avoid purity issues
+            useEffect(() => {
+                if (registry.length > 0) localStorage.setItem('hub_registry', JSON.stringify(registry));
+            }, [registry]);
+
+            useEffect(() => {
+                if (intel.length > 0) localStorage.setItem('hub_intel', JSON.stringify(intel));
+            }, [intel]);
+
+            useEffect(() => {
+                const loader = document.getElementById('boot-loader');
+                if (loader) loader.style.display = 'none';
+            }, []);
+
             const addLog = useCallback((m) => setLogs(p => ['[' + new Date().toLocaleTimeString() + '] ' + m, ...p].slice(0, 50)), []);
 
             const resetMemory = () => {
-                if (window.confirm("Confirm: Wipe all registry and leads?")) {
+                if (window.confirm("Confirm: Wipe all memory?")) {
                     localStorage.clear();
                     window.location.reload();
                 }
@@ -237,26 +262,28 @@
                                     }));
                                     setIntel(prev => [...active, ...prev]);
                                 } else {
-                                    const newReg = [...registry];
-                                    data.forEach(r => {
-                                        const n = r['charity name'] || r['organisation'] || r['name'] || r['charity_name'];
-                                        if (!n) return;
-                                        const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(n));
-                                        if (idx > -1) {
-                                            newReg[idx].loxo = (r['loxo status'] === 'Client' ? 'Client' : newReg[idx].loxo);
-                                        } else {
-                                            newReg.push({ 
-                                                name: n, 
-                                                id: r['charity number'] || r['charity_number'], 
-                                                loxo: (r['loxo status'] || 'Target'), 
-                                                cause: r['cause'] || 'Sector',
-                                                location: r['head_office_location'] || r['region'] || 'UK HQ',
-                                                lastGeneralSweep: null, 
-                                                lastDeepAudit: null 
-                                            });
-                                        }
+                                    setRegistry(prev => {
+                                        const newReg = [...prev];
+                                        data.forEach(r => {
+                                            const n = r['charity name'] || r['organisation'] || r['name'] || r['charity_name'];
+                                            if (!n) return;
+                                            const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(n));
+                                            if (idx > -1) {
+                                                newReg[idx].loxo = (r['loxo status'] === 'Client' ? 'Client' : newReg[idx].loxo);
+                                            } else {
+                                                newReg.push({ 
+                                                    name: n, 
+                                                    id: r['charity number'] || r['charity_number'], 
+                                                    loxo: (r['loxo status'] || 'Target'), 
+                                                    cause: r['cause'] || 'Sector',
+                                                    location: r['head_office_location'] || r['region'] || 'UK HQ',
+                                                    lastGeneralSweep: null, 
+                                                    lastDeepAudit: null 
+                                                });
+                                            }
+                                        });
+                                        return newReg;
                                     });
-                                    setRegistry(newReg); localStorage.setItem('hub_registry', JSON.stringify(newReg));
                                 }
                             }
                             currentFileIndex++;
@@ -279,7 +306,7 @@
                 };
             }, [registry, intel]);
 
-            const filteredList = (registry || []).filter(c => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+            const filteredList = (registry || []).filter(c => c && c.name && c.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
             const deskItems = useMemo(() => {
                 if (!activeModal || activeModal === 'settings') return [];
@@ -300,12 +327,7 @@
                 return items.filter(item => {
                     const causeMatch = leadFilters.cause === 'all' || item.cause === leadFilters.cause;
                     const locationMatch = leadFilters.location === 'all' || item.location === leadFilters.location;
-                    const salVal = parseInt((item.salary || "0").replace(/[^0-9]/g, ''));
-                    const salaryMatch = leadFilters.salary === 'all' || 
-                                       (leadFilters.salary === '40' && salVal >= 40000) ||
-                                       (leadFilters.salary === '60' && salVal >= 60000) ||
-                                       (leadFilters.salary === '80' && salVal >= 80000);
-                    return causeMatch && locationMatch && salaryMatch;
+                    return causeMatch && locationMatch;
                 });
             }, [activeModal, intel, registry, leadFilters]);
 
@@ -313,20 +335,20 @@
                 const id = n.replace(/[^a-zA-Z0-9]/g, '-');
                 const upd = { ...teamActions, [id]: { owner: u, date: new Date().toISOString(), contact: contact } };
                 setTeamActions(upd); localStorage.setItem('hub_actions', JSON.stringify(upd));
-                addLog(u + ' actioned job via contact: ' + contact);
+                addLog(u + ' assigned job to Contact: ' + contact);
             };
 
             const runGrounding = async (name, mode = 'deep') => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
                 
-                const promptDeep = "Investigate UK Charity " + name + ". Crawl aggregation boards (CharityJob, Guardian, ThirdSector, Fundraising.co.uk) AND organization 'vacancies' or 'jobs' pages. " +
-                                   "1. VACANCIES: Aggressively hunt for 'Day rate', 'Interim', 'Maternity cover', 'Contract', 'Rolling', 'Immediate start'. " +
-                                   "2. STRATEGIC RISKS: Check Charity Commission data. Identify Legacy Gap (Legacy <5% of IG pot). Over-reliance on grants (>70%). Section 114 risk. Declining income. " +
-                                   "3. STAKEHOLDERS: Find the 'CEO Name'. " +
-                                   "4. DATES: Find specific AD DATE and CLOSING DATE for each vacancy. " +
-                                   "Return JSON ONLY: {\"jobs\": [{\"title\": \"Role\", \"adDate\": \"DD/MM\", \"closingDate\": \"DD/MM\", \"link\": \"url\", \"grade\": \"A|B|C\", \"type\": \"permanent|consultancy|gap\", \"gapType\": \"Category\", \"behaviorFlag\": \"Deep strategic narrative mentioning specific financial gaps found\", \"reportsTo\": \"Mgr\", \"ceoFallback\": \"CEO Name\", \"salary\": \"£\"}]}";
+                const promptDeep = "Investigate UK Charity " + name + ". Crawl aggregation boards (CharityJob, Guardian, ThirdSector) AND organization vacancies pages. " +
+                                   "1. VACANCIES: Hunt for 'Day rate', 'Interim', 'Maternity cover', 'Contract'. " +
+                                   "2. RISKS: Identify Legacy Gap (Legacy <5% of IG), Statutory reliance (>70%), S114 risk, declining income. " +
+                                   "3. STAKEHOLDERS: Find CEO Name. " +
+                                   "4. DATES: Find specific AD DATE and CLOSING DATE. " +
+                                   "Return JSON ONLY: {\"jobs\": [{\"title\": \"Role\", \"adDate\": \"DD/MM\", \"closingDate\": \"DD/MM\", \"link\": \"url\", \"grade\": \"A|B|C\", \"type\": \"permanent|consultancy|gap\", \"gapType\": \"Category\", \"behaviorFlag\": \"Analysis\", \"reportsTo\": \"Mgr\", \"ceoFallback\": \"CEO\", \"salary\": \"£\"}]}";
 
-                const promptPulse = "Identify active senior vacancies at " + name + " via Google and CharityJob. Return JSON ONLY: {\"active\": boolean, \"jobs\": [{\"title\": \"Role\", \"link\": \"url\", \"type\": \"permanent|consultancy\"}]}";
+                const promptPulse = "Identify active senior vacancies at " + name + ". Return JSON ONLY: {\"active\": boolean, \"jobs\": []}";
 
                 try {
                     const res = await fetch(API_BASE + "?key=" + keys.gemini, {
@@ -339,47 +361,36 @@
                     const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
                     
                     if (parsed.jobs && parsed.jobs.length > 0) {
-                        const updated = [{ charityName: name, foundAt: new Date().toLocaleDateString(), jobs: parsed.jobs }, ...intel];
-                        setIntel(updated);
-                        localStorage.setItem('hub_intel', JSON.stringify(updated));
+                        setIntel(prev => [{ charityName: name, foundAt: new Date().toLocaleDateString(), jobs: parsed.jobs }, ...prev]);
                         addLog((mode === 'deep' ? 'Deep Audit' : 'Pulse Scan') + ' Secured: ' + name);
                     }
 
-                    // TIMESTAMP PERSISTENCE
-                    setRegistry(prev => {
-                        const next = prev.map(c => c.name === name ? { 
-                            ...c, 
-                            [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toISOString() 
-                        } : c);
-                        localStorage.setItem('hub_registry', JSON.stringify(next));
-                        return next;
-                    });
-                } catch (err) { addLog('Engine bypassed error for ' + name); }
+                    setRegistry(prev => prev.map(c => c.name === name ? { 
+                        ...c, [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toISOString() 
+                    } : c));
+                } catch (err) { addLog('Logic bypass for ' + name); }
             };
 
             const startBatchSweep = async () => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
                 
-                // SYSTEMATIC QUEUE LOGIC:
-                // 1. PHASE 1: Pick 500 oldest pulse targets
                 const pulseTargets = [...registry]
                     .sort((a,b) => (a.lastGeneralSweep ? new Date(a.lastGeneralSweep) : 0) - (b.lastGeneralSweep ? new Date(b.lastGeneralSweep) : 0))
                     .slice(0, 500);
 
                 if (pulseTargets.length > 0) {
-                    addLog('Systematic Pulse: Auditing next ' + pulseTargets.length + ' targets in rotation...');
+                    addLog('Systematic Pulse: Auditing ' + pulseTargets.length + ' targets...');
                     for (let i = 0; i < pulseTargets.length; i += 5) {
                         setProgress({ active: true, percent: Math.round((i/pulseTargets.length)*50), status: 'Pulse: ' + (i+1) + '/' + pulseTargets.length });
                         await Promise.all(pulseTargets.slice(i, i+5).map(t => runGrounding(t.name, 'pulse')));
                     }
                 }
 
-                // 2. PHASE 2: Pick 10 oldest deep targets
                 const auditTargets = [...registry]
                     .sort((a,b) => (a.lastDeepAudit ? new Date(a.lastDeepAudit) : 0) - (b.lastDeepAudit ? new Date(b.lastDeepAudit) : 0))
                     .slice(0, 10);
 
-                addLog('Systematic Deep Audit: Auditing next ' + auditTargets.length + ' targets in rotation...');
+                addLog('Forensic Deep Audit: Investigating ' + auditTargets.length + ' targets...');
                 for (let i = 0; i < auditTargets.length; i++) {
                     const char = auditTargets[i];
                     setProgress({ active: true, percent: 50 + Math.round(((i + 1) / auditTargets.length) * 50), status: 'Deep: ' + char.name });
@@ -387,7 +398,7 @@
                     await new Promise(r => setTimeout(r, 2000));
                 }
 
-                addLog('Systematic sweep finalized. Queue rotated.');
+                addLog('Systematic Cycle Complete.');
                 setProgress({ active: true, percent: 100, status: 'Cycle Complete.' });
                 setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
             };
@@ -398,11 +409,11 @@
                     const regData = registry.find(r => cleanName(r.name) === cleanName(e.charityName)) || {};
                     csv += `"${j.type}","${e.charityName}","${regData.cause || ''}","${regData.location || ''}","${j.title}","${j.salary || ''}","${j.adDate || ''}","${j.closingDate || ''}","${j.behaviorFlag}","${j.link}"\n`;
                 }));
-                const link = document.createElement("a");
-                link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + csv));
-                link.setAttribute("download", `Mission_Control_Audit_${new Date().toLocaleDateString()}.csv`);
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                addLog('Bulk Intel Exported.');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = `Audit_Export_${new Date().toLocaleDateString()}.csv`;
+                a.click();
             };
 
             const causes = useMemo(() => ['all', ...new Set(registry.map(r => r.cause).filter(Boolean))], [registry]);
@@ -414,8 +425,8 @@
                         <div className="flex items-center gap-4 text-left text-blue-600">
                             <Icon name="zap" size={24} className="fill-current" />
                             <div>
-                                <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.17 SYSTEMATIC</p>
+                                <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none text-left">Intelligence Hub</h2>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.18 SYSTEMATIC</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -484,7 +495,7 @@
 
                             <div className="overflow-x-auto custom-scrollbar">
                                 <table className="w-full text-left">
-                                    <thead><tr className="bg-white border-b border-slate-100 text-left"><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4">Entity Details</th><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">SIGNAL INTELLIGENCE</th><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right px-10">Warm Path</th></tr></thead>
+                                    <thead><tr className="bg-white border-b border-slate-100 text-left"><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4 text-left">Entity Details</th><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">SIGNAL INTELLIGENCE</th><th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right px-10">Warm Path</th></tr></thead>
                                     <tbody className="divide-y divide-slate-50 text-left">
                                         {(filteredList.slice(0, 50) || []).map((c, i) => {
                                             const jobs = (intel || []).filter(j => j && cleanName(j.charityName) === cleanName(c.name))[0]?.jobs || [];
@@ -498,7 +509,7 @@
                                                         <div className="flex flex-wrap gap-2 mt-3 text-left">
                                                             <span className={'urgency-badge border ' + (c.loxo === 'Client' ? 'bg-blue-100 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200')}>{c.loxo || 'Target'}</span>
                                                             {c.lastDeepAudit && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter italic">Deep Audit: {new Date(c.lastDeepAudit).toLocaleDateString()}</span>}
-                                                            {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200 italic uppercase tracking-tighter">Claimed: {action.owner}</span>}
+                                                            {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200 italic uppercase tracking-tighter text-left">Claimed: {action.owner}</span>}
                                                         </div>
                                                     </td>
                                                     <td className="px-10 py-10 text-left">
@@ -511,8 +522,8 @@
                                                                     <div className="flex gap-4 text-left">
                                                                         <span className="text-[7px] font-black text-slate-400 uppercase border-r border-slate-100 pr-3 flex items-center gap-1"><Icon name="user" size={10} /> {j.reportsTo || j.ceoFallback || 'N/A'}</span>
                                                                         <div className="flex gap-2">
-                                                                            <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter">Ad: {j.adDate || '??'}</span>
-                                                                            <span className="text-[7px] font-black text-red-500 uppercase tracking-tighter">End: {j.closingDate || '??'}</span>
+                                                                            <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter text-left">Ad: {j.adDate || '??'}</span>
+                                                                            <span className="text-[7px] font-black text-red-500 uppercase tracking-tighter text-left">End: {j.closingDate || '??'}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -576,14 +587,14 @@
                                             </div>
                                             <div className="flex flex-col gap-1 text-left">
                                                 <label className="text-[8px] font-black text-slate-400 uppercase ml-1">HQ Region</label>
-                                                <select value={leadFilters.location} onChange={(e) => setLeadFilters({...leadFilters, location: e.target.value})} className="bg-slate-100 border-none rounded-xl text-[10px] font-black px-4 py-2 uppercase outline-none shadow-inner">
+                                                <select value={leadFilters.location} onChange={(e) => setLeadFilters({...leadFilters, location: e.target.value})} className="bg-slate-100 border-none rounded-xl text-[10px] font-black px-4 py-2 uppercase outline-none shadow-inner text-left">
                                                     {locations.map(l => <option key={l} value={l}>{l}</option>)}
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex-1 overflow-auto custom-scrollbar p-10 text-left">
+                                <div className="flex-1 overflow-auto custom-scrollbar p-10 text-left italic">
                                     <DeskTable items={deskItems} teamActions={teamActions} onClaim={claim} />
                                 </div>
                             </div>
@@ -618,7 +629,7 @@
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        if (root) root.render(<App />);
     </script>
 </body>
 </html>
