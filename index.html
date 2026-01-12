@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.21 - Forensic Trace</title>
+    <title>Intelligence Hub V21.22 - Strategic Deep-Dive</title>
     <!-- PRODUCTION LIBS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -25,15 +25,15 @@
         .progress-shimmer { background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         #boot-loader { position: fixed; inset: 0; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; transition: opacity 0.5s ease; }
-        .trace-line { border-left: 2px solid #3b82f6; padding-left: 8px; margin-bottom: 4px; animation: slideIn 0.3s ease-out; }
+        .trace-line { border-left: 2px solid #3b82f6; padding-left: 8px; margin-bottom: 4px; animation: slideIn 0.3s ease-out; font-family: 'Inter', monospace; font-size: 9px; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
-<body class="p-4 md:p-8 text-left">
+<body class="p-4 md:p-8 text-left selection:bg-blue-100">
     <!-- Boot Sequence Loader -->
     <div id="boot-loader">
         <div class="font-black text-slate-400 uppercase tracking-widest text-[10px] italic animate-pulse mb-4">
-            Initializing Intelligence Hub V21.21...
+            Initializing Intelligence Hub V21.22...
         </div>
         <button onclick="localStorage.clear(); window.location.reload();" class="text-[8px] font-bold text-slate-300 uppercase hover:text-red-400 transition-colors tracking-tighter">
             System Hang? Click to Force Reset Data
@@ -99,7 +99,7 @@
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 text-left">Entity & Regional Map</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 text-left">Signal Window</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-center">Risk</th>
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[45%] text-left">Strategic Forensic Intelligence</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[45%] text-left">Strategic Forensic Analysis</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-right px-2">Loxo Action</th>
                     </tr>
                 </thead>
@@ -116,7 +116,7 @@
                                         <span className="text-[7px] text-blue-500 font-bold uppercase">{l.cause || 'Sector Registry'}</span>
                                         <span className="text-[7px] text-slate-400 font-bold uppercase border-l border-slate-200 pl-1">{l.location || 'UK'}</span>
                                     </div>
-                                    <div className="text-[6px] text-slate-300 font-bold mt-1 uppercase italic tracking-tighter">Forensic Sync: {l.auditDate || 'Pending Cycle'}</div>
+                                    <div className="text-[6px] text-slate-300 font-bold mt-1 uppercase italic tracking-tighter">Forensic Sync: {l.auditDate || 'New'}</div>
                                 </td>
                                 <td className="py-6 px-2">
                                     <div className="font-bold text-[11px] text-blue-600 uppercase italic leading-none">{l.title || 'Signal Trace'}</div>
@@ -130,20 +130,20 @@
                                             <span className="text-[8px] text-red-600 font-black uppercase italic">{l.closingDate || '??/??'}</span>
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-[8px] font-black text-slate-400 uppercase italic">Sal: {l.salary || 'Competitive'}</div>
+                                    <div className="mt-2 text-[8px] font-black text-slate-400 uppercase italic leading-none">Estimate: {l.salary || 'Competitive'}</div>
                                 </td>
                                 <td className="py-6 text-center">
                                     <span className={'urgency-badge ' + getGradeStyle(l.grade)}>{l.grade === 'A' ? 'CRITICAL' : l.grade === 'B' ? 'STRATEGIC' : 'MONITOR'}</span>
                                 </td>
                                 <td className="py-6 px-2 text-[10px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-6 text-left">
                                     <div className="bg-slate-900 text-white inline-block px-2 py-0.5 rounded text-[7px] font-black uppercase mb-2 tracking-tighter">
-                                        LOXO CONTACT: {l.reportsTo || (l.ceoFallback ? 'CEO FALLBACK: ' + l.ceoFallback : 'STAKEHOLDER MISSING')}
+                                        ASSIGNMENT: {l.reportsTo || (l.ceoFallback ? 'CEO: ' + l.ceoFallback : 'STAKEHOLDER SCANNING...')}
                                     </div>
                                     <div className="font-bold text-slate-800 not-italic mb-1 uppercase text-[8px] tracking-widest text-emerald-600 flex items-center gap-1">
-                                        <Icon name="shield-alert" size={10} /> {l.gapType || 'Forensic Trace'}
+                                        <Icon name="shield-alert" size={10} /> {l.gapType || 'Forensic Insight'}
                                     </div>
                                     {l.behaviorFlag || 'Automated intelligence discovery.'}
-                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none italic">Verified via: {l.source || 'Intelligence Feed'}</div>
+                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none italic">Intelligence Path: {l.source || 'Discovery'}</div>
                                 </td>
                                 <td className="py-6 px-2 text-right">
                                     <div className="flex items-center justify-end gap-2 text-right">
@@ -175,8 +175,8 @@
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.21 Forensic Trace Active. Real-time monitoring ready.']);
-            const [trace, setTrace] = useState([]); // Live Investigative Trace
+            const [logs, setLogs] = useState(['[SYSTEM] V21.22 Strategic Deep-Dive Active. Financial Benchmarking forced.']);
+            const [trace, setTrace] = useState([]); 
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             const [emailInput, setEmailInput] = useState('');
 
@@ -188,7 +188,7 @@
                 cc: (typeof window !== 'undefined' ? localStorage.getItem('hub_cc_key') : '') || ""
             }));
 
-            // Auto-Persistence
+            // Sync with localstorage after state updates
             useEffect(() => {
                 if (registry.length > 0) localStorage.setItem('hub_registry', JSON.stringify(registry));
             }, [registry]);
@@ -206,7 +206,7 @@
             }, []);
 
             const addLog = useCallback((m) => setLogs(p => ['[' + new Date().toLocaleTimeString() + '] ' + m, ...p].slice(0, 50)), []);
-            const addTrace = useCallback((m) => setTrace(p => [m, ...p].slice(0, 10)), []);
+            const addTrace = useCallback((m) => setTrace(p => [m, ...p].slice(0, 15)), []);
 
             const resetMemory = () => {
                 if (window.confirm("Confirm Reset: This will wipe all discovered leads and registry items.")) {
@@ -218,7 +218,7 @@
             const handleImport = (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
-                setProgress({ active: true, percent: 5, status: 'Auditing data layers...' });
+                setProgress({ active: true, percent: 5, status: 'Analyzing Data Layers...' });
                 
                 let currentFileIndex = 0;
                 const processNextFile = () => {
@@ -244,11 +244,7 @@
                             });
 
                             const s = data[0] || {};
-                            if (s['first name'] && s['company']) {
-                                setConnections(data); localStorage.setItem('hub_connections', JSON.stringify(data));
-                            } else if (s['establishmentname'] || s['headfirstname']) {
-                                setSchools(data); localStorage.setItem('hub_schools', JSON.stringify(data));
-                            } else if (s['agencyscore'] || s['detailedreason']) {
+                            if (s['agencyscore'] || s['detailedreason']) {
                                 const historical = data.map(r => ({
                                     charityName: r['charity'] || r['organisation'],
                                     jobs: [{
@@ -271,7 +267,7 @@
                                         charityName: r['organisation'] || r['charity'],
                                         jobs: [{
                                             title: r['job title'] || r['title'], salary: r['salary'] || 'TBC',
-                                            link: r['link'] || r['url'] || '#',
+                                            link: (r['link'] || r['url'] || '#').replace('https://www.google.com/search?q=', ''),
                                             since: r['advertised since'] || 'Recently',
                                             reportsTo: r['reports to'] || 'CEO', grade: 'C',
                                             type: (r['salary'] || '').toLowerCase().includes('day') ? 'consultancy' : 'permanent',
@@ -283,15 +279,15 @@
                                     setRegistry(prev => {
                                         const newReg = [...prev];
                                         data.forEach(r => {
-                                            const n = r['charity name'] || r['organisation'] || r['name'] || r['charity_name'];
+                                            const n = r['charity name'] || r['organisation'] || r['name'] || r['charity_name'] || r['entity'];
                                             if (!n) return;
                                             const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(n));
                                             if (idx > -1) {
                                                 newReg[idx].loxo = (r['loxo status'] === 'Client' ? 'Client' : newReg[idx].loxo);
                                             } else {
                                                 newReg.push({ 
-                                                    name: n, id: r['charity number'], loxo: (r['loxo status'] || 'Target'), 
-                                                    cause: r['cause'] || 'Sector', location: r['head_office_location'] || 'UK',
+                                                    name: n, id: r['charity number'] || r['number'], loxo: (r['loxo status'] || 'Target'), 
+                                                    cause: r['cause'] || 'Sector', location: r['head_office_location'] || r['region'] || 'UK',
                                                     lastGeneralSweep: null, lastDeepAudit: null 
                                                 });
                                             }
@@ -351,19 +347,20 @@
 
             const runGrounding = async (name, mode = 'deep') => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
-                addTrace(`INIT: ${mode.toUpperCase()} sweep for ${name}...`);
+                addTrace(`START: ${mode.toUpperCase()} investigation for ${name}...`);
                 
-                const promptDeep = `Investigate UK Charity ${name}. 
-                    1. VACANCIES: Search aggregation boards (CharityJob, ThirdSector) AND 'vacancies' pages. AGGRESSIVELY hunt for 'Day rate', 'Interim', 'Maternity', 'Contract', 'Rolling', 'Immediate start'.
-                    2. RISKS: Mandatory check of Charity Commission. Identify Legacy Gap (Legacy <5% of IG pot). Over-reliance on grants (>70%). Section 114 risk. Declining income trends.
-                    3. STAKEHOLDERS: Find the 'CEO Name'.
-                    4. DATES: Find specific post and closing dates.
-                    Return JSON ONLY: {"jobs": [{"title": "Role", "adDate": "DD/MM", "closingDate": "DD/MM", "link": "url", "grade": "A|B|C", "type": "permanent|consultancy|gap", "gapType": "Category", "behaviorFlag": "Deep narrative using specific crisis markers found", "reportsTo": "Mgr", "ceoFallback": "Name", "salary": "£"}]}`;
+                const promptDeep = `Forensic Investigation Protocol: ${name}.
+                    1. VACANCIES: Search aggregation boards AND Careers pages. FORCED hunt for 'Day rate', 'Interim', 'Maternity', 'Contract'.
+                    2. FINANCIAL AUDIT (MANDATORY): Scraping Charity Commission. Calculate Legacy vs Individual Giving %. If Legacy <5%, generate "Strategic Gap" entry even if no jobs exist.
+                    3. CRISP SIGNAL: Hunt for 'S114', 'Decommissioning', 'MTFS cuts', 'Toxic reviews'.
+                    4. STAKEHOLDER: Find CEO Name.
+                    REQUIREMENT: Return JSON ONLY. If zero jobs, generate a "Strategic Gap" entry with grade B/A based on financial decline or legacy gap.
+                    JSON: {"jobs": [{"title": "Role/Strategic Gap", "adDate": "DD/MM", "closingDate": "DD/MM", "link": "url", "grade": "A|B|C", "type": "permanent|consultancy|gap", "gapType": "Legacy Gap|Crisis|Statutory", "behaviorFlag": "Deep narrative using found crisis markers", "reportsTo": "Mgr", "ceoFallback": "Name", "salary": "£"}]}`;
 
-                const promptPulse = `Check ${name} and CharityJob for active senior fundraising vacancies (>£40k). Return JSON ONLY: {"active": boolean, "jobs": []}`;
+                const promptPulse = `Identify ANY active senior vacancies at ${name}. Return JSON ONLY: {"active": boolean, "jobs": []}`;
 
                 try {
-                    addTrace(`SEARCHING: Cross-referencing 5 UK Job Boards for ${name}...`);
+                    addTrace(`CRAWLING: UK Job Boards & Charity Commission API for ${name}...`);
                     const res = await fetch(API_BASE + "?key=" + keys.gemini, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -374,17 +371,17 @@
                     const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
                     
                     if (parsed.jobs && parsed.jobs.length > 0) {
-                        addTrace(`SUCCESS: Found ${parsed.jobs.length} leads for ${name}.`);
+                        addTrace(`DECODED: Found ${parsed.jobs.length} signals for ${name}. Benchmarking complete.`);
                         setIntel(prev => [{ charityName: name, foundAt: new Date().toLocaleDateString(), jobs: parsed.jobs }, ...prev]);
                         addLog(`${mode === 'deep' ? 'Forensic' : 'Pulse'} Secured: ${name}`);
                     } else {
-                        addTrace(`CLEAN: No active signals detected for ${name}.`);
+                        addTrace(`STABLE: No significant strategic risks or vacancies for ${name}.`);
                     }
 
                     setRegistry(prev => prev.map(c => c.name === name ? { 
                         ...c, [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toISOString() 
                     } : c));
-                } catch (err) { addTrace(`ERROR: Bypassed logic for ${name}.`); }
+                } catch (err) { addTrace(`BYPASS: Systematic error for ${name}. Skipping batch.`); }
             };
 
             const startBatchSweep = async () => {
@@ -392,7 +389,7 @@
                 
                 const pulseTargets = [...registry].sort((a,b) => (a.lastGeneralSweep ? new Date(a.lastGeneralSweep) : 0) - (b.lastGeneralSweep ? new Date(b.lastGeneralSweep) : 0)).slice(0, 500);
                 if (pulseTargets.length > 0) {
-                    addLog('Pulse Phase: 500 Targets...');
+                    addLog('Initializing Pulse Cycle (500 Targets)...');
                     for (let i = 0; i < pulseTargets.length; i += 5) {
                         setProgress({ active: true, percent: Math.round((i/pulseTargets.length)*50), status: 'Pulse: ' + (i+1) + '/' + pulseTargets.length });
                         await Promise.all(pulseTargets.slice(i, i+5).map(t => runGrounding(t.name, 'pulse')));
@@ -400,7 +397,7 @@
                 }
 
                 const auditTargets = [...registry].sort((a,b) => (a.lastDeepAudit ? new Date(a.lastDeepAudit) : 0) - (b.lastDeepAudit ? new Date(b.lastDeepAudit) : 0)).slice(0, 10);
-                addLog('Audit Phase: 10 Targets...');
+                addLog('Initializing Deep Audit (Next 10 Targets)...');
                 for (let i = 0; i < auditTargets.length; i++) {
                     const char = auditTargets[i];
                     setProgress({ active: true, percent: 50 + Math.round(((i + 1) / auditTargets.length) * 50), status: 'Forensic: ' + char.name });
@@ -408,8 +405,8 @@
                     await new Promise(r => setTimeout(r, 2000));
                 }
 
-                addLog('Systematic Cycle Finalized.');
-                setProgress({ active: true, percent: 100, status: 'System Cycle Complete.' });
+                addLog('Systematic Cycle Complete.');
+                setProgress({ active: true, percent: 100, status: 'Cycle Finalized.' });
                 setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
             };
 
@@ -422,7 +419,7 @@
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
-                a.href = url; a.download = `Registry_Audit_${new Date().toLocaleDateString()}.csv`;
+                a.href = url; a.download = `Recruitment_Registry_Audit_${new Date().toLocaleDateString()}.csv`;
                 a.click();
             };
 
@@ -435,8 +432,8 @@
                         <div className="flex items-center gap-4 text-left text-blue-600">
                             <Icon name="zap" size={24} className="fill-current" />
                             <div>
-                                <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.21 FORENSIC TRACE</p>
+                                <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none text-left">Intelligence Hub</h2>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.22 DEEP-DIVE</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -482,7 +479,7 @@
                             </button>
                         </div>
 
-                        {/* Search and Action Bar */}
+                        {/* Action Bar */}
                         <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-200 overflow-hidden mb-8 text-left">
                             <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/30 text-left">
                                 <div className="flex-1 max-w-md relative text-left">
@@ -536,7 +533,7 @@
                                                                 <div key={idx} className={'p-5 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden text-left ' + (j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : 'bg-white'))}>
                                                                     <span className={'absolute top-0 right-0 px-3 py-1 rounded-bl font-black text-[8px] uppercase ' + (getGradeStyle(j.grade))}>Grade {j.grade || 'C'}</span>
                                                                     <div className="text-xs font-black uppercase text-slate-900 pr-14 tracking-tight leading-none mb-2 text-left">{j.title}</div>
-                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Signal: {j.gapType || 'Forensic Insight'} • {j.behaviorFlag}</div>
+                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Signal: {j.gapType || 'Forensic Trace'} • {j.behaviorFlag}</div>
                                                                     <div className="flex gap-4 text-left">
                                                                         <span className="text-[7px] font-black text-slate-400 uppercase border-r border-slate-100 pr-3 flex items-center gap-1"><Icon name="user" size={10} /> {j.reportsTo || j.ceoFallback || 'N/A'}</span>
                                                                         <div className="flex gap-2">
@@ -561,7 +558,7 @@
                                                                 <select onChange={(e) => claim(c.name, e.target.value)} className="text-[11px] font-black border-2 border-slate-200 px-5 py-3 rounded-2xl bg-white outline-none focus:border-blue-600 transition-all uppercase tracking-tighter text-right cursor-pointer">
                                                                     <option>Claim As...</option><option>Tim</option><option>Rory</option><option>Anton</option>
                                                                 </select>
-                                                                <button onClick={() => runGrounding(c.name, 'deep')} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all flex items-center justify-end gap-2 px-2 text-left">Deep Investigate <Icon name="chevron-right" size={12} /></button>
+                                                                <button onClick={() => runGrounding(c.name, 'deep')} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all flex items-center justify-end gap-2 px-2 text-left">Audit Strategy <Icon name="chevron-right" size={12} /></button>
                                                             </div>
                                                         )}
                                                     </td>
@@ -573,28 +570,25 @@
                             </div>
                         </div>
 
-                        {/* LIVE MONITOR CONSOLE */}
+                        {/* LIVE TRACE MONITOR */}
                         {isAdmin && (
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
-                                {/* Trace Terminal */}
-                                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-blue-400 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[300px] flex flex-col">
+                                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-blue-400 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[350px] flex flex-col">
                                     <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
-                                        <span className="uppercase tracking-widest font-black flex items-center gap-2 italic"><Icon name="terminal" size={14} /> Live Intelligence Trace</span>
-                                        <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-[8px] font-black uppercase animate-pulse">Monitoring Grounding Tools</span>
+                                        <span className="uppercase tracking-widest font-black flex items-center gap-2 italic"><Icon name="terminal" size={14} /> Forensic Intelligence Trace</span>
+                                        <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-[8px] font-black uppercase animate-pulse">Monitoring Grounding Loops</span>
                                     </div>
                                     <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1">
                                         {trace.map((t, i) => <div key={i} className="trace-line">{t}</div>)}
-                                        {trace.length === 0 && <div className="text-slate-600 italic">Sweep idle. Waiting for Auto-Pilot activation...</div>}
+                                        {trace.length === 0 && <div className="text-slate-600 italic">Waiting for Auto-Pilot activation...</div>}
                                     </div>
                                 </div>
-                                
-                                {/* System Log */}
-                                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-slate-500 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[300px] flex flex-col">
+                                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-slate-500 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[350px] flex flex-col">
                                     <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                                         <span className="uppercase tracking-widest font-black flex items-center gap-2 italic"><Icon name="shield-check" size={14} /> Mission Control Monitor</span>
-                                        <span className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-[8px] font-black uppercase">Core System Operational</span>
+                                        <span className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-[8px] font-black uppercase">Core Operational</span>
                                     </div>
-                                    <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1">
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 text-left italic">
                                         {logs.map((l, i) => <div key={i} className="hover:text-slate-300 transition-colors">{l}</div>)}
                                     </div>
                                 </div>
@@ -611,9 +605,9 @@
                                     <div className="flex justify-between items-end text-left">
                                         <div>
                                             <h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">
-                                                {activeModal === 'gap' ? 'Proactive Risk Desk' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active search Intel'}
+                                                {activeModal === 'gap' ? 'Proactive Risk Desk' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Market search Intel'}
                                             </h2>
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic leading-none">Strategic Benchmarking Data for Tim & Rory</p>
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic leading-none">Forensic Benchmarking for Rory & Tim</p>
                                         </div>
                                         <div className="flex gap-4">
                                             <div className="flex flex-col gap-1 text-left">
