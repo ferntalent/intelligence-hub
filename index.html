@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.26 - Pro-Auto Build</title>
+    <title>Intelligence Hub V21.27 - Forensic Build</title>
     <!-- PRODUCTION LIBS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -32,7 +32,7 @@
 <body class="p-4 md:p-8 text-left selection:bg-blue-100">
     <div id="boot-loader">
         <div class="font-black text-slate-400 uppercase tracking-widest text-[10px] italic animate-pulse mb-4 text-center">
-            Initializing Intelligence Hub V21.26 (Pro-Auto Integration)...
+            Initializing Forensic Hub V21.27...
         </div>
     </div>
     <div id="root"></div>
@@ -90,7 +90,7 @@
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 text-left">Entity & Regional Map</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 text-left">Signal Window</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-center">Risk</th>
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[45%] text-left">Strategic Forensic Intelligence</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[45%] text-left">Forensic Strategic Intelligence</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-right px-2">Loxo Action</th>
                     </tr>
                 </thead>
@@ -107,33 +107,36 @@
                                         <span className="text-[7px] text-blue-500 font-bold uppercase">{l.cause || 'Sector Registry'}</span>
                                         <span className="text-[7px] text-slate-400 font-bold uppercase border-l border-slate-200 pl-1">{l.location || 'UK HQ'}</span>
                                     </div>
-                                    <div className="text-[6px] text-slate-300 font-bold mt-1 uppercase italic tracking-tighter tracking-tighter">Audit Sync: {l.auditDate || 'Pending'}</div>
+                                    <div className="text-[6px] text-slate-300 font-bold mt-1 uppercase italic tracking-tighter">Audit Sync: {l.auditDate || 'Pending'}</div>
                                 </td>
                                 <td className="py-6 px-2">
                                     <div className="font-bold text-[11px] text-blue-600 uppercase italic leading-none">{l.title || 'Signal Trace'}</div>
                                     <div className="flex gap-2 mt-2">
-                                        <div className="flex flex-col bg-slate-50 px-1.5 py-0.5 rounded">
-                                            <span className="text-[5px] font-black text-slate-400 uppercase tracking-tighter">Live</span>
-                                            <span className="text-[8px] text-slate-600 font-black uppercase">{l.adDate || '??/??'}</span>
+                                        <div className="flex flex-col bg-slate-50 px-2 py-1 rounded">
+                                            <span className="text-[5px] font-black text-slate-400 uppercase tracking-tighter">ADVERT POSTED</span>
+                                            <span className="text-[9px] text-slate-600 font-black uppercase">{l.adDate || '??/??'}</span>
                                         </div>
-                                        <div className="flex flex-col bg-red-50 px-1.5 py-0.5 rounded">
-                                            <span className="text-[5px] font-black text-red-300 uppercase tracking-tighter">Deadline</span>
-                                            <span className="text-[8px] text-red-600 font-black uppercase italic">{l.closingDate || '??/??'}</span>
+                                        <div className="flex flex-col bg-red-50 px-2 py-1 rounded border border-red-100">
+                                            <span className="text-[5px] font-black text-red-400 uppercase tracking-tighter">CLOSING DATE</span>
+                                            <span className="text-[9px] text-red-600 font-black uppercase italic">{l.closingDate || '??/??'}</span>
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-[8px] font-black text-slate-400 uppercase italic leading-none tracking-tight">Est: {l.salary || 'Competitive'}</div>
+                                    <div className="mt-2 text-[8px] font-black text-slate-400 uppercase italic">Salary: {l.salary || 'Competitive'}</div>
                                 </td>
                                 <td className="py-6 text-center">
                                     <span className={'urgency-badge ' + getGradeStyle(l.grade)}>{l.grade === 'A' ? 'CRITICAL' : l.grade === 'B' ? 'STRATEGIC' : 'MONITOR'}</span>
                                 </td>
                                 <td className="py-6 px-2 text-[10px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-6 text-left">
-                                    <div className="bg-slate-900 text-white inline-block px-2 py-0.5 rounded text-[7px] font-black uppercase mb-2 tracking-tighter">
-                                        ASSIGNMENT: {l.reportsTo || (l.ceoFallback ? 'CEO: ' + l.ceoFallback : 'SCANNING...')}
+                                    <div className="bg-slate-900 text-white inline-block px-3 py-1 rounded text-[8px] font-black uppercase mb-3 tracking-widest shadow-sm">
+                                        REPORTS TO: {l.reportsTo || (l.ceoFallback ? l.ceoFallback : 'STAKEHOLDER SEARCHING...')}
                                     </div>
-                                    <div className="font-bold text-slate-800 not-italic mb-1 uppercase text-[8px] tracking-widest text-emerald-600 flex items-center gap-1">
-                                        <Icon name="target" size={10} /> {l.gapType || 'Forensic Insight'}
+                                    <div className="font-bold text-slate-800 not-italic mb-1 uppercase text-[9px] tracking-widest text-emerald-600 flex items-center gap-2">
+                                        <Icon name="target" size={12} /> {l.gapType || 'Forensic Insight'}
                                     </div>
-                                    {l.behaviorFlag || 'Automated intelligence.'}
+                                    <div className="text-slate-600 font-medium">
+                                        {l.behaviorFlag || 'No strategic red flags detected in current filing cycle.'}
+                                    </div>
+                                    <div className="mt-3 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none italic opacity-60">Trace Source: {l.source || 'Intelligence Feed'}</div>
                                 </td>
                                 <td className="py-6 px-2 text-right">
                                     <div className="flex items-center justify-end gap-2 text-right">
@@ -143,7 +146,7 @@
                                         {action ? (
                                             <span className="text-[8px] font-black text-emerald-600 uppercase italic px-4 tracking-tighter">Synced</span>
                                         ) : (
-                                            <button onClick={() => onClaim(l.charity, 'Tim', l.reportsTo || l.ceoFallback)} className="bg-blue-600 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase shadow-lg hover:bg-blue-700 active:scale-95 transition-all tracking-tighter">Assign Stakeholder</button>
+                                            <button onClick={() => onClaim(l.charity, 'Tim', l.reportsTo || l.ceoFallback)} className="bg-blue-600 text-white text-[9px] font-black px-5 py-3 rounded-xl uppercase shadow-lg hover:bg-blue-700 active:scale-95 transition-all tracking-tighter">Sync Stakeholder</button>
                                         )}
                                     </div>
                                 </td>
@@ -164,7 +167,7 @@
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.26 Build ready. Pro-Auto Content Routing Active.']);
+            const [logs, setLogs] = useState(['[SYSTEM] V21.27 Forensic Integration Active. Logic mappings finalized.']);
             const [trace, setTrace] = useState([]); 
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             const [leadFilters, setLeadFilters] = useState({ cause: 'all', location: 'all' });
@@ -189,10 +192,10 @@
             }, []);
 
             const addLog = useCallback((m) => setLogs(p => ['[' + new Date().toLocaleTimeString() + '] ' + m, ...p].slice(0, 50)), []);
-            const addTrace = useCallback((m) => setTrace(p => [m, ...p].slice(0, 20)), []);
+            const addTrace = useCallback((m) => setTrace(p => [m, ...p].slice(0, 25)), []);
 
             const resetMemory = () => {
-                if (window.confirm("Confirm: Clear Hub database?")) {
+                if (window.confirm("Confirm: Clear entire database?")) {
                     localStorage.clear();
                     window.location.reload();
                 }
@@ -201,12 +204,12 @@
             const handleUnifiedImport = (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
-                setProgress({ active: true, percent: 5, status: 'Intelligent Data Routing...' });
+                setProgress({ active: true, percent: 5, status: 'Auditing Data Layers...' });
                 
                 let currentFileIndex = 0;
                 const processNextFile = () => {
                     if (currentFileIndex >= files.length) {
-                        setProgress({ active: true, percent: 100, status: 'Registry Map Ready.' });
+                        setProgress({ active: true, percent: 100, status: 'Sync Complete.' });
                         setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
                         return;
                     }
@@ -225,56 +228,85 @@
                                 return obj;
                             });
 
-                            // PRO-AUTO ROUTING BASED ON HEADERS
-                            const isLeads = headers.includes('organisation') || headers.includes('job title');
-                            const isHistory = headers.includes('agencyscore') || headers.includes('detailedreason');
-                            const isLoxo = headers.includes('owner') || headers.includes('recent activity date');
-                            const isSchools = headers.includes('establishmentname') || headers.includes('schoolwebsite');
+                            // FORENSIC ROUTING DNA
+                            const isLeads = headers.includes('closing date') || headers.includes('job title');
+                            const isHistory = headers.includes('agencyscore') || headers.includes('detailedreason') || headers.includes('reportstoname');
+                            const isLoxo = headers.includes('owner') || headers.includes('loxo status');
+                            const isSchools = headers.includes('establishmentname');
                             const isLinkedIn = headers.includes('first name') && headers.includes('company');
 
                             if (isHistory) {
                                 const historical = data.map(r => ({
-                                    charityName: r['charity'] || r['organisation'] || r['charity_name'],
+                                    charityName: r['charity'] || r['organisation'] || r['entity_name'],
                                     jobs: [{
                                         title: r['jobtitle'] || r['job title'] || 'History Trace',
                                         salary: r['salary'] || 'TBC',
-                                        link: r['link'] || '#',
-                                        grade: 'B', type: 'permanent',
-                                        behaviorFlag: r['detailedreason'] || 'Historical Match.',
+                                        link: r['link'] || r['directlink'] || '#',
+                                        since: r['tenuresince'] || 'History',
+                                        reportsTo: r['reportstoname'] || r['reportsto'] || 'CEO',
+                                        grade: r['agencyscore'] ? 'A' : 'B',
+                                        type: 'permanent',
+                                        behaviorFlag: r['detailedreason'] || r['reason'] || 'Archive artifact.',
                                         source: 'Strategic Archive'
                                     }]
                                 }));
-                                setIntel(prev => [...historical, ...prev]);
+                                setIntel(prev => {
+                                    const merged = [...prev];
+                                    historical.forEach(h => { if (!merged.some(m => cleanName(m.charityName) === cleanName(h.charityName) && m.jobs[0].title === h.jobs[0].title)) merged.unshift(h); });
+                                    return merged;
+                                });
+                                addLog(`Merged History: ${file.name}`);
                             } else if (isLinkedIn) {
                                 setConnections(data); localStorage.setItem('hub_connections', JSON.stringify(data));
+                                addLog(`Network: ${file.name}`);
                             } else if (isSchools) {
                                 setSchools(data); localStorage.setItem('hub_schools', JSON.stringify(data));
+                                addLog(`IDPE: ${file.name}`);
+                            } else if (isLeads) {
+                                const activeLeads = data.map(r => ({
+                                    charityName: r['organisation'] || r['charity'] || r['organisation_name'],
+                                    jobs: [{
+                                        title: r['job title'] || r['title'], salary: r['salary'],
+                                        link: r['link'] || r['url'], type: 'permanent',
+                                        adDate: r['ad_date'] || r['advertised_since'] || '??/??',
+                                        closingDate: r['closing date'] || r['closing_date'] || '??/??',
+                                        behaviorFlag: r['note'] || 'Market discovery lead.', source: 'Direct Intake'
+                                    }]
+                                }));
+                                setIntel(prev => {
+                                    const merged = [...prev];
+                                    activeLeads.forEach(al => { if (!merged.some(m => m.jobs[0].link === al.jobs[0].link)) merged.unshift(al); });
+                                    return merged;
+                                });
+                                addLog(`Active Leads: ${file.name}`);
                             } else {
                                 setRegistry(prev => {
                                     const newReg = [...prev];
                                     data.forEach(r => {
-                                        // HEADER PRIORITY: Strictly use names, ignore descriptions
-                                        const n = r['charity name'] || r['charity_name'] || r['organisation'] || r['establishmentname'] || r['entity_name'] || r['name'];
-                                        // Reject descriptions: Long strings or generic niche words
+                                        // STRICT NAME RESOLUTION
+                                        const n = r['charity name'] || r['charity_name'] || r['organisation'] || r['establishmentname'] || r['name'] || r['entity_name'];
+                                        // Skip descriptions: if name is all-caps but single word or contains 'TALKS', 'CENTRES', etc.
                                         if (!n || n.length > 60 || (n === n.toUpperCase() && n.split(' ').length < 2)) return;
-                                        
+                                        if (n.toLowerCase().includes('talks') || n.toLowerCase().includes('centres')) return;
+
                                         const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(n));
                                         if (idx === -1) {
                                             newReg.push({ 
                                                 name: n, 
-                                                id: r['charity number'] || r['entity_id'] || r['number'], 
+                                                id: r['charity number'] || r['number'] || r['entity_id'], 
                                                 loxo: (r['loxo status'] || (isLoxo ? 'Client' : 'Target')), 
-                                                cause: r['cause'] || r['what the charity does'] || r['how the charity helps'] || 'Sector',
-                                                location: r['location'] || r['head_office_location'] || r['town'] || 'UK',
+                                                cause: r['what the charity does'] || r['cause'] || r['how the charity helps'] || 'Sector',
+                                                location: r['location'] || r['region'] || r['head_office_location'] || 'UK',
                                                 lastGeneralSweep: null, lastDeepAudit: null 
                                             });
                                         }
                                     });
                                     return newReg;
                                 });
+                                addLog(`Registry Layer: ${file.name}`);
                             }
                             currentFileIndex++;
-                            setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Layering ' + file.name });
+                            setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Mapping ' + file.name });
                             setTimeout(processNextFile, 50);
                         } catch (err) { currentFileIndex++; processNextFile(); }
                     };
@@ -305,7 +337,7 @@
                     }
                 }));
                 return items.filter(item => {
-                    const causeMatch = leadFilters.cause === 'all' || item.cause === leadFilters.cause;
+                    const causeMatch = leadFilters.cause === 'all' || (item.cause && item.cause.includes(leadFilters.cause));
                     const locationMatch = leadFilters.location === 'all' || item.location === leadFilters.location;
                     return causeMatch && locationMatch;
                 });
@@ -320,34 +352,32 @@
 
             const runGrounding = async (name, mode = 'deep') => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
-                addTrace(`SCRAPING: UK Boards & Charity Commission for ${name}...`);
+                addTrace(`PHASE 1: Scraping UK Boards & Commission Filings for ${name}...`);
                 
                 const promptDeep = `STRICT FINANCIAL FORENSICS PROTOCOL: ${name}.
-                    1. AUDIT MANDATE: You MUST find the most recent Charity Commission data for ${name}.
-                    2. NUMERICAL BENCHMARK: Calculate: (A) Total Voluntary Income, (B) Legacy Bequests Income. 
-                    3. STRATEGIC GAP: If Legacy is <5% of Total Voluntary Income, generate a lead (type: gap).
-                    4. VACANCIES: Search for 'Day rate', 'Interim', 'Maternity', 'Contract'. Extract Ad Date and Closing Date.
-                    5. STAKEHOLDER: Identify the CEO name.
-                    JSON ONLY: {"jobs": [{"title": "Forensic Signal", "adDate": "DD/MM", "closingDate": "DD/MM", "link": "commission_url", "grade": "A|B|C", "type": "permanent|consultancy|gap", "gapType": "Legacy Gap|Statutory Risk", "behaviorFlag": "Legacy at X% of IG. Peer benchmark is 10%+. Win potential high.", "reportsTo": "CEO", "ceoFallback": "Name", "salary": "£"}]}`;
+                    1. AUDIT MANDATE: Scrape Charity Commission filings. Extract Total Voluntary Income vs Legacy Income.
+                    2. NUMERICAL BENCHMARK: If Legacy < 5% of Voluntary Income, you MUST flag as a "Strategy Gap".
+                    3. VACANCIES: Search boards and 'vacancies' subdomains. Hunt for 'Interim', 'Day rate', 'Maternity', 'Contract'.
+                    4. DATES: ALWAYS extract 'Ad Posted Date' and 'Closing Date'.
+                    5. STAKEHOLDER: Find CEO Name.
+                    JSON ONLY: {"jobs": [{"title": "Forensic Signal", "adDate": "DD/MM", "closingDate": "DD/MM", "link": "url", "grade": "A|B|C", "type": "permanent|consultancy|gap", "gapType": "Legacy Gap|Crisis", "behaviorFlag": "Numeric benchmark: Legacy at X% of IG (£Y total). Peer target 10%. Pitches as legacy growth consultant.", "reportsTo": "Line Manager Name", "ceoFallback": "CEO Name", "salary": "£"}]}`;
 
                 try {
                     const res = await fetch(API_BASE + "?key=" + keys.gemini, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: mode === 'deep' ? promptDeep : "Pulse check vacancies at " + name }] }], tools: [{ "google_search": {} }] })
+                        body: JSON.stringify({ contents: [{ parts: [{ text: mode === 'deep' ? promptDeep : "Pulse check senior vacancies at " + name }] }], tools: [{ "google_search": {} }] })
                     });
                     const data = await res.json();
                     const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{\"jobs\": []}";
                     const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
                     
                     if (parsed.jobs && parsed.jobs.length > 0) {
-                        addTrace(`SUCCESS: Found ${parsed.jobs.length} forensic signals for ${name}. Benchmarking complete.`);
+                        addTrace(`SUCCESS: Found ${parsed.jobs.length} signals for ${name}. Benchmarking complete.`);
                         setIntel(prev => [{ charityName: name, foundAt: new Date().toLocaleDateString(), jobs: parsed.jobs }, ...prev]);
-                    } else { addTrace(`CLEAN: No high-risk signals for ${name}.`); }
+                    } else { addTrace(`CLEAN: No risk markers for ${name}.`); }
 
-                    setRegistry(prev => prev.map(c => c.name === name ? { 
-                        ...c, [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toISOString() 
-                    } : c));
+                    setRegistry(prev => prev.map(c => c.name === name ? { ...c, [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toISOString() } : c));
                 } catch (err) { addTrace(`ERROR: Bypassed logic for ${name}.`); }
             };
 
@@ -368,21 +398,20 @@
                     await runGrounding(char.name, 'deep');
                     await new Promise(r => setTimeout(r, 2000));
                 }
-                addLog('Systematic Cycle Complete.');
                 setProgress({ active: true, percent: 100, status: 'Cycle Complete.' });
                 setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
             };
 
             const bulkExportIntel = () => {
-                let csv = "Type,Entity,Cause,Location,Role,Salary,AdDate,ClosingDate,StrategicReason,Link\n";
+                let csv = "Type,Entity,Cause,Location,Role,Salary,AdDate,ClosingDate,Stakeholder,StrategicReason,Link\n";
                 (intel || []).forEach(e => (e?.jobs || []).forEach(j => {
                     const regData = registry.find(r => cleanName(r.name) === cleanName(e.charityName)) || {};
-                    csv += `"${j.type}","${e.charityName}","${regData.cause || ''}","${regData.location || ''}","${j.title}","${j.salary || ''}","${j.adDate || ''}","${j.closingDate || ''}","${j.behaviorFlag}","${j.link}"\n`;
+                    csv += `"${j.type}","${e.charityName}","${regData.cause || ''}","${regData.location || ''}","${j.title}","${j.salary || ''}","${j.adDate || ''}","${j.closingDate || ''}","${j.reportsTo || j.ceoFallback || ''}","${j.behaviorFlag}","${j.link}"\n`;
                 }));
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
-                a.href = url; a.download = `Registry_Audit_${new Date().toLocaleDateString()}.csv`;
+                a.href = url; a.download = `Recruitment_Registry_Audit_${new Date().toLocaleDateString()}.csv`;
                 a.click();
             };
 
@@ -396,11 +425,11 @@
                             <Icon name="zap" size={24} className="fill-current" />
                             <div>
                                 <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none text-left">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.26 PRO-AUTO</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic text-left leading-none">V21.27 FORENSIC BUILD</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setIsAdmin(!isAdmin)} className={'px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border ' + (isAdmin ? 'bg-slate-900 text-white shadow-xl' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-sm')}>{isAdmin ? <Icon name="shield-check" size={14} /> : <Icon name="users" size={14} />} {isAdmin ? 'Admin Mode' : 'Colleague View'}</button>
+                            <button onClick={() => setIsAdmin(!isAdmin)} className={'px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border ' + (isAdmin ? 'bg-slate-900 text-white border-slate-900 shadow-xl' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-sm')}>{isAdmin ? <Icon name="shield-check" size={14} /> : <Icon name="users" size={14} />} {isAdmin ? 'Admin Mode' : 'Colleague View'}</button>
                             {isAdmin && <button onClick={() => setActiveModal('settings')} className="text-slate-300 hover:text-slate-900 transition-colors"><Icon name="settings" size={20} /></button>}
                         </div>
                     </nav>
@@ -422,7 +451,6 @@
                     )}
 
                     <main className="max-w-[1600px] mx-auto w-full p-8 flex-1">
-                        {/* Stats Dashboard */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 text-center">
                             <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm text-center">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Entity Registry</span>
@@ -442,8 +470,7 @@
                             </button>
                         </div>
 
-                        {/* Action Bar */}
-                        <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-200 overflow-hidden mb-8 text-left text-left text-left">
+                        <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-200 overflow-hidden mb-8 text-left text-left">
                             <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/30 text-left">
                                 <div className="flex-1 max-w-md relative text-left">
                                     <Icon name="search" size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" />
@@ -494,12 +521,12 @@
                                                                 <div key={idx} className={'p-5 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden text-left ' + (j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : 'bg-white'))}>
                                                                     <span className={'absolute top-0 right-0 px-3 py-1 rounded-bl font-black text-[8px] uppercase ' + (getGradeStyle(j.grade))}>Grade {j.grade || 'C'}</span>
                                                                     <div className="text-xs font-black uppercase text-slate-900 pr-14 tracking-tight leading-none mb-2 text-left">{j.title}</div>
-                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Forensic Trace: {j.gapType || 'Forensic Benchmarking'} • {j.behaviorFlag}</div>
+                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Signal: {j.gapType || 'Forensic Trace'} • {j.behaviorFlag}</div>
                                                                     <div className="flex gap-4 text-left">
-                                                                        <span className="text-[7px] font-black text-slate-400 uppercase border-r border-slate-100 pr-3 flex items-center gap-1"><Icon name="user" size={10} /> {j.reportsTo || j.ceoFallback || 'CEO'}</span>
-                                                                        <div className="flex gap-2 text-left">
+                                                                        <span className="text-[7px] font-black text-slate-400 uppercase border-r border-slate-100 pr-3 flex items-center gap-1"><Icon name="user" size={10} /> {j.reportsTo || j.ceoFallback || 'N/A'}</span>
+                                                                        <div className="flex gap-2">
                                                                             <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter text-left">Ad: {j.adDate || '??'}</span>
-                                                                            <span className="text-[7px] font-black text-red-500 uppercase tracking-tighter text-left font-bold">End: {j.closingDate || '??'}</span>
+                                                                            <span className="text-[7px] font-black text-red-500 uppercase tracking-tighter text-left font-bold italic">End: {j.closingDate || '??'}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -544,12 +571,12 @@
                                         {trace.length === 0 && <div className="text-slate-600 italic text-left">Waiting for Auto-Pilot activation...</div>}
                                     </div>
                                 </div>
-                                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-slate-500 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[350px] flex flex-col text-left">
+                                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-slate-500 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[350px] flex flex-col text-left text-left">
                                     <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4 text-left">
                                         <span className="uppercase tracking-widest font-black flex items-center gap-2 italic text-left"><Icon name="shield-check" size={14} /> Mission Control Monitor</span>
                                         <span className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-tighter text-left">System Health: Operational</span>
                                     </div>
-                                    <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 text-left italic">
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 text-left italic text-left">
                                         {logs.map((l, i) => <div key={i} className="hover:text-slate-300 transition-colors text-left">{l}</div>)}
                                     </div>
                                 </div>
@@ -562,31 +589,31 @@
                         <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[5000] p-4 md:p-10 flex items-center justify-center text-left">
                             <div className="bg-white rounded-[4rem] shadow-2xl w-full h-full max-w-[1600px] flex flex-col overflow-hidden relative border border-white/20 text-left">
                                 <button onClick={() => setActiveModal(null)} className="absolute top-8 right-8 p-4 bg-slate-100 rounded-full hover:bg-slate-200 transition-all z-[10] shadow-sm"><Icon name="x" size={20} className="text-slate-900" /></button>
-                                <div className="p-10 border-b border-slate-100 bg-slate-50/50 text-left">
+                                <div className="p-10 border-b border-slate-100 bg-slate-50/50 text-left text-left">
                                     <div className="flex justify-between items-end text-left">
                                         <div>
                                             <h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">
                                                 {activeModal === 'gap' ? 'Proactive Risk Desk' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active search Intel'}
                                             </h2>
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic leading-none">Pro-Auto Analysis for Tim & Rory</p>
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic leading-none">Contextual Analysis for Tim & Rory</p>
                                         </div>
                                         <div className="flex gap-4 text-left">
-                                            <div className="flex flex-col gap-1 text-left">
+                                            <div className="flex flex-col gap-1 text-left text-left text-left">
                                                 <label className="text-[8px] font-black text-slate-400 uppercase ml-1 text-left">Cause Area</label>
-                                                <select value={leadFilters.cause} onChange={(e) => setLeadFilters({...leadFilters, cause: e.target.value})} className="bg-slate-100 border-none rounded-xl text-[10px] font-black px-4 py-2 uppercase outline-none shadow-inner text-left">
+                                                <select value={leadFilters.cause} onChange={(e) => setLeadFilters({...leadFilters, cause: e.target.value})} className="bg-slate-100 border-none rounded-xl text-[10px] font-black px-4 py-2 uppercase outline-none shadow-inner text-left text-left">
                                                     {causes.map(c => <option key={c} value={c}>{c}</option>)}
                                                 </select>
                                             </div>
-                                            <div className="flex flex-col gap-1 text-left">
+                                            <div className="flex flex-col gap-1 text-left text-left text-left">
                                                 <label className="text-[8px] font-black text-slate-400 uppercase ml-1 text-left">HQ Region</label>
-                                                <select value={leadFilters.location} onChange={(e) => setLeadFilters({...leadFilters, location: e.target.value})} className="bg-slate-100 border-none rounded-xl text-[10px] font-black px-4 py-2 uppercase outline-none shadow-inner text-left">
+                                                <select value={leadFilters.location} onChange={(e) => setLeadFilters({...leadFilters, location: e.target.value})} className="bg-slate-100 border-none rounded-xl text-[10px] font-black px-4 py-2 uppercase outline-none shadow-inner text-left text-left">
                                                     {locations.map(l => <option key={l} value={l}>{l}</option>)}
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex-1 overflow-auto custom-scrollbar p-10 text-left">
+                                <div className="flex-1 overflow-auto custom-scrollbar p-10 text-left text-left">
                                     <DeskTable items={deskItems} teamActions={teamActions} onClaim={claim} />
                                 </div>
                             </div>
@@ -595,12 +622,12 @@
 
                     {activeModal === 'settings' && (
                         <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[6000] flex items-center justify-center p-6 text-center text-left">
-                            <div className="bg-white rounded-[3.5rem] shadow-2xl max-w-md w-full p-12 text-left">
+                            <div className="bg-white rounded-[3.5rem] shadow-2xl max-w-md w-full p-12 text-left text-left text-left">
                                 <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center leading-none text-left text-blue-600">Security Core</h3>
-                                <div className="space-y-6 mt-8 text-left text-[10px]">
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left">Gemini API Pro</label><input type="password" id="gemini-key-input" defaultValue={keys.gemini} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left">Loxo API Key</label><input type="password" id="loxo-key-input" defaultValue={keys.loxo} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">CC-API Sub Key</label><input type="password" id="cc-key-input" defaultValue={keys.cc} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
+                                <div className="space-y-6 mt-8 text-left text-[10px] text-left text-left">
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left">Gemini API Pro</label><input type="password" id="gemini-key-input" defaultValue={keys.gemini} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left text-left text-left" /></div>
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left">Loxo API Key</label><input type="password" id="loxo-key-input" defaultValue={keys.loxo} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left text-left text-left" /></div>
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">CC-API Sub Key</label><input type="password" id="cc-key-input" defaultValue={keys.cc} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left text-left text-left" /></div>
                                 </div>
                                 <button onClick={() => { 
                                     const g = document.getElementById('gemini-key-input').value;
@@ -612,7 +639,7 @@
                                     setKeys({ gemini: g, loxo: l, cc: c });
                                     setActiveModal(null); 
                                     addLog('Security credentials synchronized.'); 
-                                }} className="w-full bg-blue-600 text-white py-6 rounded-2xl font-black uppercase italic shadow-2xl mt-10 hover:bg-blue-700 transition-all active:scale-95 text-center">Verify deployment</button>
+                                }} className="w-full bg-blue-600 text-white py-6 rounded-2xl font-black uppercase italic shadow-2xl mt-10 hover:bg-blue-700 transition-all active:scale-95 text-center text-left text-left">Verify deployment</button>
                             </div>
                         </div>
                     )}
