@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.14 - CRM Bridge</title>
+    <title>Intelligence Hub V21.15 - Auto-Pilot</title>
     <!-- LIBS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -157,7 +157,7 @@
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.14 CRM Fallback Bridge Active.']);
+            const [logs, setLogs] = useState(['[SYSTEM] V21.15 Auto-Pilot Orchestrator active.']);
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             const [emailInput, setEmailInput] = useState('');
 
@@ -259,6 +259,7 @@
                                                 loxo: (r['loxo status'] || 'Target'), 
                                                 cause: r['cause'] || 'Sector',
                                                 location: r['head_office_location'] || r['region'] || 'UK HQ',
+                                                lastGeneralSweep: null, 
                                                 lastDeepAudit: null 
                                             });
                                         }
@@ -326,15 +327,17 @@
 
             const runGrounding = async (name, mode = 'deep') => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
-                setProgress({ active: true, percent: 10, status: 'Investigating Stakeholders & Market...' });
-                addLog('Investigating ' + name + '...');
                 
-                const prompt = "Investigate UK Charity " + name + ". " +
-                               "1. VACANCIES: Search aggregation boards AND organization 'vacancies' pages. Extract Perm vs Consultancy/Interim (Day rates, contract, maternity cover). " +
-                               "2. DATES: Find 'Role Post Date' and 'Closing Date' for each vacancy. " +
-                               "3. STAKEHOLDER: Find the 'CEO Name'. If a specific hiring manager isn't found, return the CEO Name as fallback. " +
-                               "4. GAPS: Audit Charity Commission. Legacy <5%? Statutory over-reliance? Financial Decline? S114 risk? Glassdoor culture? " +
-                               "Return JSON ONLY: {\"jobs\": [{\"title\": \"Lead\", \"adDate\": \"DD/MM\", \"closingDate\": \"DD/MM\", \"link\": \"url\", \"grade\": \"A|B|C\", \"type\": \"permanent|consultancy|gap\", \"gapType\": \"Category\", \"behaviorFlag\": \"Why this is a win\", \"reportsTo\": \"Hiring Mgr Name\", \"ceoFallback\": \"CEO Name\", \"source\": \"Source\", \"salary\": \"£\"}]}";
+                const promptDeep = "Investigate UK Charity " + name + ". Crawl aggregation boards AND organization 'vacancies' pages. " +
+                                   "1. VACANCIES: Extract Perm vs Consultancy/Interim (Day rates, contract, maternity cover). " +
+                                   "2. DATES: Find 'Role Post Date' and 'Closing Date'. " +
+                                   "3. STAKEHOLDER: Find the 'CEO Name'. " +
+                                   "4. GAPS: Audit Charity Commission. Legacy <5%? Statutory over-reliance? S114 risk? Glassdoor culture? " +
+                                   "Return JSON ONLY: {\"jobs\": [{\"title\": \"Lead\", \"adDate\": \"DD/MM\", \"closingDate\": \"DD/MM\", \"link\": \"url\", \"grade\": \"A|B|C\", \"type\": \"permanent|consultancy|gap\", \"gapType\": \"Category\", \"behaviorFlag\": \"Why this is a win\", \"reportsTo\": \"Hiring Mgr Name\", \"ceoFallback\": \"CEO Name\", \"source\": \"Source\", \"salary\": \"£\"}]}";
+
+                const promptPulse = "Search CharityJob and Google for active senior fundraising vacancies (>£40k) at " + name + ". Return JSON ONLY: {\"active\": boolean, \"jobs\": [{\"title\": \"Lead\", \"link\": \"url\", \"type\": \"permanent|consultancy\"}]}";
+
+                const prompt = mode === 'deep' ? promptDeep : promptPulse;
 
                 try {
                     const res = await fetch(API_BASE + "?key=" + keys.gemini, {
@@ -350,37 +353,52 @@
                         const updated = [{ charityName: name, foundAt: new Date().toLocaleDateString(), jobs: parsed.jobs }, ...intel];
                         setIntel(updated);
                         localStorage.setItem('hub_intel', JSON.stringify(updated));
-                        
-                        setRegistry(prev => {
-                            const next = prev.map(c => c.name === name ? { ...c, lastDeepAudit: new Date().toLocaleDateString() } : c);
-                            localStorage.setItem('hub_registry', JSON.stringify(next));
-                            return next;
-                        });
-
-                        addLog('Intelligence Secure: ' + name);
+                        addLog((mode === 'deep' ? 'Deep Audit' : 'Pulse Scan') + ' Secured: ' + name);
                     }
-                    setProgress({ active: false, percent: 0, status: '' });
-                } catch (err) { addLog('Research stalled for ' + name); setProgress({ active: false, percent: 0, status: '' }); }
+
+                    setRegistry(prev => {
+                        const next = prev.map(c => c.name === name ? { ...c, [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toLocaleDateString() } : c);
+                        localStorage.setItem('hub_registry', JSON.stringify(next));
+                        return next;
+                    });
+                } catch (err) { addLog('Logic stall for ' + name); }
             };
 
             const startBatchSweep = async () => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
-                const batchSize = 10;
-                const targets = [...registry]
+                
+                // PHASE ONE: 500 Pulse Scans
+                const pulseBatchSize = 500;
+                const pulseTargets = [...registry]
+                    .filter(c => !c.lastGeneralSweep)
+                    .slice(0, pulseBatchSize);
+                
+                if (pulseTargets.length > 0) {
+                    addLog('Phase 1/2: High-Volume Pulse Scan (' + pulseTargets.length + ' targets)...');
+                    for (let i = 0; i < pulseTargets.length; i += 5) { // Sub-batches of 5 for stability
+                        setProgress({ active: true, percent: Math.round((i / pulseTargets.length) * 50), status: 'Pulse Scan: ' + (i+1) + '/' + pulseTargets.length });
+                        await Promise.all(pulseTargets.slice(i, i + 5).map(t => runGrounding(t.name, 'pulse')));
+                    }
+                }
+
+                // PHASE TWO: 10 Deep Audits
+                const auditBatchSize = 10;
+                const auditTargets = [...registry]
                     .sort((a, b) => {
                         if (!a.lastDeepAudit) return -1;
                         return new Date(a.lastDeepAudit) - new Date(b.lastDeepAudit);
                     })
-                    .slice(0, batchSize);
+                    .slice(0, auditBatchSize);
 
-                addLog('Automated Daily Sweep: Auditing next ' + targets.length + ' targets...');
-                for (let i = 0; i < targets.length; i++) {
-                    const char = targets[i];
-                    setProgress({ active: true, percent: Math.round(((i + 1) / targets.length) * 100), status: 'Deep Audit: ' + char.name });
+                addLog('Phase 2/2: Forensic Deep Audit (Next ' + auditTargets.length + ' targets)...');
+                for (let i = 0; i < auditTargets.length; i++) {
+                    const char = auditTargets[i];
+                    setProgress({ active: true, percent: 50 + Math.round(((i + 1) / auditTargets.length) * 50), status: 'Deep Audit: ' + char.name });
                     await runGrounding(char.name, 'deep');
                     await new Promise(r => setTimeout(r, 2000));
                 }
-                addLog('Daily cyclical sweep complete.');
+
+                addLog('Dual-Stage Sweep Complete.');
                 setProgress({ active: true, percent: 100, status: 'Sweep Finalized.' });
                 setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
             };
@@ -398,6 +416,28 @@
                 addLog('Bulk Intelligence CSV Exported.');
             };
 
+            const handleEmailParse = async () => {
+                if (!emailInput.trim() || !keys.gemini) return;
+                setProgress({ active: true, percent: 10, status: 'Parsing Intel Feed...' });
+                const prompt = "Extract senior leads (>£40k) from alert. Delineate Perm vs Consultancy. JSON ONLY: {\"jobs\": [{\"title\": \"Role\", \"charity\": \"Name\", \"type\": \"permanent|consultancy\", \"link\": \"url\", \"adDate\": \"DD/MM\", \"closingDate\": \"DD/MM\", \"salary\": \"£\"}]}. Text: " + emailInput;
+                try {
+                    const res = await fetch(API_BASE + "?key=" + keys.gemini, {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    const data = await res.json();
+                    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{\"jobs\": []}";
+                    const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
+                    if (parsed.jobs) {
+                        const formatted = parsed.jobs.map(j => ({ charityName: j.charity, foundAt: new Date().toLocaleDateString(), jobs: [{ ...j, behaviorFlag: 'Intelligence Feed Lead', reportsTo: 'Recruiter', grade: 'B' }] }));
+                        setIntel(prev => [...formatted, ...prev]);
+                        addLog('Imported ' + parsed.jobs.length + ' leads from Feed.');
+                    }
+                    setEmailInput('');
+                    setProgress({ active: false, percent: 0, status: '' });
+                } catch (err) { setProgress({ active: false, percent: 0, status: '' }); }
+            };
+
             // Unique values for filters
             const causes = useMemo(() => ['all', ...new Set(registry.map(r => r.cause).filter(Boolean))], [registry]);
             const locations = useMemo(() => ['all', ...new Set(registry.map(r => r.location).filter(Boolean))], [registry]);
@@ -409,7 +449,7 @@
                             <Icon name="zap" size={24} className="fill-current" />
                             <div>
                                 <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.14 CRM BRIDGE</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.15 AUTO-PILOT</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -465,7 +505,7 @@
                                         <Icon name="download" size={14} /> Import Data 1-7<input type="file" className="hidden" multiple accept=".csv" onChange={handleImport} />
                                     </label>
                                     <button className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 flex items-center gap-2 shadow-lg" onClick={startBatchSweep}>
-                                        <Icon name="zap" size={14} /> Daily Deep Sweep (10)
+                                        <Icon name="zap" size={14} /> Auto-Pilot Sweep (500 Pulse / 10 Deep)
                                     </button>
                                     <button onClick={bulkExportLeads} className="bg-white border border-slate-200 px-6 py-4 rounded-2xl text-[11px] font-black uppercase text-blue-600 hover:bg-blue-50 transition-all shadow-sm flex items-center gap-2">
                                         <Icon name="file-text" size={14} /> Bulk Export Intel
@@ -491,7 +531,7 @@
                                                         <div className="font-black uppercase text-xl tracking-tighter text-slate-900 leading-none">{c.name}</div>
                                                         <div className="flex flex-wrap gap-2 mt-3 text-left">
                                                             <span className={'urgency-badge border ' + (c.loxo === 'Client' ? 'bg-blue-100 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200')}>{c.loxo || 'Target'}</span>
-                                                            {c.lastDeepAudit && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter">Sweep: {c.lastDeepAudit}</span>}
+                                                            {c.lastDeepAudit && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter">Audit: {c.lastDeepAudit}</span>}
                                                             {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200 italic uppercase tracking-tighter">Claimed: {action.owner}</span>}
                                                         </div>
                                                     </td>
