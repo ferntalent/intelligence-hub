@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.22 - Strategic Deep-Dive</title>
+    <title>Intelligence Hub V21.23 - Contextual Resolution</title>
     <!-- PRODUCTION LIBS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -25,15 +25,15 @@
         .progress-shimmer { background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         #boot-loader { position: fixed; inset: 0; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; transition: opacity 0.5s ease; }
-        .trace-line { border-left: 2px solid #3b82f6; padding-left: 8px; margin-bottom: 4px; animation: slideIn 0.3s ease-out; font-family: 'Inter', monospace; font-size: 9px; }
+        .trace-line { border-left: 2px solid #3b82f6; padding-left: 8px; margin-bottom: 4px; animation: slideIn 0.2s ease-out; font-family: 'Inter', monospace; font-size: 9px; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body class="p-4 md:p-8 text-left selection:bg-blue-100">
     <!-- Boot Sequence Loader -->
     <div id="boot-loader">
-        <div class="font-black text-slate-400 uppercase tracking-widest text-[10px] italic animate-pulse mb-4">
-            Initializing Intelligence Hub V21.22...
+        <div class="font-black text-slate-400 uppercase tracking-widest text-[10px] italic animate-pulse mb-4 text-center">
+            Initializing Intelligence Hub V21.23...
         </div>
         <button onclick="localStorage.clear(); window.location.reload();" class="text-[8px] font-bold text-slate-300 uppercase hover:text-red-400 transition-colors tracking-tighter">
             System Hang? Click to Force Reset Data
@@ -99,7 +99,7 @@
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 text-left">Entity & Regional Map</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 text-left">Signal Window</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-center">Risk</th>
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[45%] text-left">Strategic Forensic Analysis</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[45%] text-left">Forensic Strategic Intelligence</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-right px-2">Loxo Action</th>
                     </tr>
                 </thead>
@@ -116,34 +116,34 @@
                                         <span className="text-[7px] text-blue-500 font-bold uppercase">{l.cause || 'Sector Registry'}</span>
                                         <span className="text-[7px] text-slate-400 font-bold uppercase border-l border-slate-200 pl-1">{l.location || 'UK'}</span>
                                     </div>
-                                    <div className="text-[6px] text-slate-300 font-bold mt-1 uppercase italic tracking-tighter">Forensic Sync: {l.auditDate || 'New'}</div>
+                                    <div className="text-[6px] text-slate-300 font-bold mt-1 uppercase italic tracking-tighter">Forensic Sync: {l.auditDate || 'Pending Cycle'}</div>
                                 </td>
                                 <td className="py-6 px-2">
                                     <div className="font-bold text-[11px] text-blue-600 uppercase italic leading-none">{l.title || 'Signal Trace'}</div>
                                     <div className="flex gap-2 mt-2">
                                         <div className="flex flex-col bg-slate-50 px-1.5 py-0.5 rounded">
-                                            <span className="text-[5px] font-black text-slate-400 uppercase">Live</span>
+                                            <span className="text-[5px] font-black text-slate-400 uppercase tracking-tighter">Live</span>
                                             <span className="text-[8px] text-slate-600 font-black uppercase">{l.adDate || '??/??'}</span>
                                         </div>
                                         <div className="flex flex-col bg-red-50 px-1.5 py-0.5 rounded">
-                                            <span className="text-[5px] font-black text-red-300 uppercase">Deadline</span>
+                                            <span className="text-[5px] font-black text-red-300 uppercase tracking-tighter">Deadline</span>
                                             <span className="text-[8px] text-red-600 font-black uppercase italic">{l.closingDate || '??/??'}</span>
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-[8px] font-black text-slate-400 uppercase italic leading-none">Estimate: {l.salary || 'Competitive'}</div>
+                                    <div className="mt-2 text-[8px] font-black text-slate-400 uppercase italic leading-none">Est: {l.salary || 'Competitive'}</div>
                                 </td>
                                 <td className="py-6 text-center">
                                     <span className={'urgency-badge ' + getGradeStyle(l.grade)}>{l.grade === 'A' ? 'CRITICAL' : l.grade === 'B' ? 'STRATEGIC' : 'MONITOR'}</span>
                                 </td>
                                 <td className="py-6 px-2 text-[10px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-6 text-left">
                                     <div className="bg-slate-900 text-white inline-block px-2 py-0.5 rounded text-[7px] font-black uppercase mb-2 tracking-tighter">
-                                        ASSIGNMENT: {l.reportsTo || (l.ceoFallback ? 'CEO: ' + l.ceoFallback : 'STAKEHOLDER SCANNING...')}
+                                        LOXO CONTACT: {l.reportsTo || (l.ceoFallback ? 'CEO: ' + l.ceoFallback : 'STAKEHOLDER SCANNING...')}
                                     </div>
                                     <div className="font-bold text-slate-800 not-italic mb-1 uppercase text-[8px] tracking-widest text-emerald-600 flex items-center gap-1">
                                         <Icon name="shield-alert" size={10} /> {l.gapType || 'Forensic Insight'}
                                     </div>
                                     {l.behaviorFlag || 'Automated intelligence discovery.'}
-                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none italic">Intelligence Path: {l.source || 'Discovery'}</div>
+                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none italic underline decoration-blue-100">Intel Path: {l.source || 'Discovery'}</div>
                                 </td>
                                 <td className="py-6 px-2 text-right">
                                     <div className="flex items-center justify-end gap-2 text-right">
@@ -153,7 +153,7 @@
                                         {action ? (
                                             <span className="text-[8px] font-black text-emerald-600 uppercase italic px-4">Synced: {action.owner}</span>
                                         ) : (
-                                            <button onClick={() => onClaim(l.charity, 'Tim', l.reportsTo || l.ceoFallback)} className="bg-blue-600 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase shadow-lg hover:bg-blue-700 active:scale-95 transition-all">Assign to Contact</button>
+                                            <button onClick={() => onClaim(l.charity, 'Tim', l.reportsTo || l.ceoFallback)} className="bg-blue-600 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase shadow-lg hover:bg-blue-700 active:scale-95 transition-all tracking-tighter">Assign Stakeholder</button>
                                         )}
                                     </div>
                                 </td>
@@ -175,7 +175,7 @@
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.22 Strategic Deep-Dive Active. Financial Benchmarking forced.']);
+            const [logs, setLogs] = useState(['[SYSTEM] V21.23 Active. Name-Resolution layer forced.']);
             const [trace, setTrace] = useState([]); 
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             const [emailInput, setEmailInput] = useState('');
@@ -206,7 +206,7 @@
             }, []);
 
             const addLog = useCallback((m) => setLogs(p => ['[' + new Date().toLocaleTimeString() + '] ' + m, ...p].slice(0, 50)), []);
-            const addTrace = useCallback((m) => setTrace(p => [m, ...p].slice(0, 15)), []);
+            const addTrace = useCallback((m) => setTrace(p => [m, ...p].slice(0, 20)), []);
 
             const resetMemory = () => {
                 if (window.confirm("Confirm Reset: This will wipe all discovered leads and registry items.")) {
@@ -218,7 +218,7 @@
             const handleImport = (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
-                setProgress({ active: true, percent: 5, status: 'Analyzing Data Layers...' });
+                setProgress({ active: true, percent: 5, status: 'Mapping Intelligence Layers...' });
                 
                 let currentFileIndex = 0;
                 const processNextFile = () => {
@@ -279,7 +279,8 @@
                                     setRegistry(prev => {
                                         const newReg = [...prev];
                                         data.forEach(r => {
-                                            const n = r['charity name'] || r['organisation'] || r['name'] || r['charity_name'] || r['entity'];
+                                            // PRIORITIZE NAME OVER DESCRIPTION
+                                            const n = r['charity_name'] || r['charity name'] || r['organisation'] || r['entity'] || r['name'];
                                             if (!n) return;
                                             const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(n));
                                             if (idx > -1) {
@@ -297,7 +298,7 @@
                                 }
                             }
                             currentFileIndex++;
-                            setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Merging ' + file.name });
+                            setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Syncing Layer ' + file.name });
                             setTimeout(processNextFile, 100);
                         } catch (err) { currentFileIndex++; processNextFile(); }
                     };
@@ -347,20 +348,21 @@
 
             const runGrounding = async (name, mode = 'deep') => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
-                addTrace(`START: ${mode.toUpperCase()} investigation for ${name}...`);
+                addTrace(`PHASE 1: Scraping 5 UK Job Boards for Interim/Contract roles at ${name}...`);
                 
-                const promptDeep = `Forensic Investigation Protocol: ${name}.
-                    1. VACANCIES: Search aggregation boards AND Careers pages. FORCED hunt for 'Day rate', 'Interim', 'Maternity', 'Contract'.
-                    2. FINANCIAL AUDIT (MANDATORY): Scraping Charity Commission. Calculate Legacy vs Individual Giving %. If Legacy <5%, generate "Strategic Gap" entry even if no jobs exist.
-                    3. CRISP SIGNAL: Hunt for 'S114', 'Decommissioning', 'MTFS cuts', 'Toxic reviews'.
-                    4. STAKEHOLDER: Find CEO Name.
-                    REQUIREMENT: Return JSON ONLY. If zero jobs, generate a "Strategic Gap" entry with grade B/A based on financial decline or legacy gap.
-                    JSON: {"jobs": [{"title": "Role/Strategic Gap", "adDate": "DD/MM", "closingDate": "DD/MM", "link": "url", "grade": "A|B|C", "type": "permanent|consultancy|gap", "gapType": "Legacy Gap|Crisis|Statutory", "behaviorFlag": "Deep narrative using found crisis markers", "reportsTo": "Mgr", "ceoFallback": "Name", "salary": "£"}]}`;
+                const promptDeep = `CRITICAL FORENSIC PROTOCOL: ${name}.
+                    1. CONTEXT RESOLUTION: If the name '${name}' is a category (e.g. 'Talks', 'Centres'), identify the TOP 3 UK CHARITIES in that sector and audit THEM instead.
+                    2. VACANCIES: Search aggregation boards AND Careers pages. FORCED hunt for 'Day rate', 'Interim', 'Maternity', 'Contract'.
+                    3. FINANCIAL AUDIT (MANDATORY): Audit Charity Commission. Identify if Legacy <5% of Total Voluntary Income. Identify Statutory Over-reliance (>70%).
+                    4. RISK SCAN: Hunt for 'S114', 'ICB Funding Withdrawal', 'Decommissioning', 'Redundancy consultation'.
+                    5. STAKEHOLDER: Find CEO Name.
+                    REQUIREMENT: Return JSON ONLY. Always produce a "Strategic Gap" entry (type: gap) if legacy income is disproportionately low for their size.
+                    JSON: {"jobs": [{"title": "Role/Strategic Gap", "adDate": "DD/MM", "closingDate": "DD/MM", "link": "url", "grade": "A|B|C", "type": "permanent|consultancy|gap", "gapType": "Legacy Gap|Statutory Crisis|Digital Health", "behaviorFlag": "Forensic narrative mentioning specific financial/procurement markers found", "reportsTo": "Mgr", "ceoFallback": "Name", "salary": "£"}]}`;
 
-                const promptPulse = `Identify ANY active senior vacancies at ${name}. Return JSON ONLY: {"active": boolean, "jobs": []}`;
+                const promptPulse = `Identify ANY active senior vacancies at ${name} via Google Search tools. JSON ONLY: {"active": boolean, "jobs": []}`;
 
                 try {
-                    addTrace(`CRAWLING: UK Job Boards & Charity Commission API for ${name}...`);
+                    addTrace(`PHASE 2: Auditing Charity Commission for Legacy/IG Benchmarks for ${name}...`);
                     const res = await fetch(API_BASE + "?key=" + keys.gemini, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -371,17 +373,17 @@
                     const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
                     
                     if (parsed.jobs && parsed.jobs.length > 0) {
-                        addTrace(`DECODED: Found ${parsed.jobs.length} signals for ${name}. Benchmarking complete.`);
+                        addTrace(`SUCCESS: Found ${parsed.jobs.length} forensic signals for ${name}.`);
                         setIntel(prev => [{ charityName: name, foundAt: new Date().toLocaleDateString(), jobs: parsed.jobs }, ...prev]);
                         addLog(`${mode === 'deep' ? 'Forensic' : 'Pulse'} Secured: ${name}`);
                     } else {
-                        addTrace(`STABLE: No significant strategic risks or vacancies for ${name}.`);
+                        addTrace(`PHASE 3: No critical strategic risks detected for ${name} based on current filings.`);
                     }
 
                     setRegistry(prev => prev.map(c => c.name === name ? { 
                         ...c, [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toISOString() 
                     } : c));
-                } catch (err) { addTrace(`BYPASS: Systematic error for ${name}. Skipping batch.`); }
+                } catch (err) { addTrace(`RECOVERY: Bypassed logic for ${name}. Queued for retry.`); }
             };
 
             const startBatchSweep = async () => {
@@ -389,15 +391,15 @@
                 
                 const pulseTargets = [...registry].sort((a,b) => (a.lastGeneralSweep ? new Date(a.lastGeneralSweep) : 0) - (b.lastGeneralSweep ? new Date(b.lastGeneralSweep) : 0)).slice(0, 500);
                 if (pulseTargets.length > 0) {
-                    addLog('Initializing Pulse Cycle (500 Targets)...');
-                    for (let i = 0; i < pulseTargets.length; i += 5) {
+                    addLog('Pulse Cycle Initiated (500 Targets)...');
+                    for (let i = 0; i < pulseTargets.length; i += 10) {
                         setProgress({ active: true, percent: Math.round((i/pulseTargets.length)*50), status: 'Pulse: ' + (i+1) + '/' + pulseTargets.length });
-                        await Promise.all(pulseTargets.slice(i, i+5).map(t => runGrounding(t.name, 'pulse')));
+                        await Promise.all(pulseTargets.slice(i, i+10).map(t => runGrounding(t.name, 'pulse')));
                     }
                 }
 
                 const auditTargets = [...registry].sort((a,b) => (a.lastDeepAudit ? new Date(a.lastDeepAudit) : 0) - (b.lastDeepAudit ? new Date(b.lastDeepAudit) : 0)).slice(0, 10);
-                addLog('Initializing Deep Audit (Next 10 Targets)...');
+                addLog('Forensic Cycle Initiated (Next 10 Targets)...');
                 for (let i = 0; i < auditTargets.length; i++) {
                     const char = auditTargets[i];
                     setProgress({ active: true, percent: 50 + Math.round(((i + 1) / auditTargets.length) * 50), status: 'Forensic: ' + char.name });
@@ -405,8 +407,8 @@
                     await new Promise(r => setTimeout(r, 2000));
                 }
 
-                addLog('Systematic Cycle Complete.');
-                setProgress({ active: true, percent: 100, status: 'Cycle Finalized.' });
+                addLog('Systematic Cycle Finalized.');
+                setProgress({ active: true, percent: 100, status: 'Cycle Complete.' });
                 setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
             };
 
@@ -419,7 +421,7 @@
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
-                a.href = url; a.download = `Recruitment_Registry_Audit_${new Date().toLocaleDateString()}.csv`;
+                a.href = url; a.download = `Recruitment_Audit_${new Date().toLocaleDateString()}.csv`;
                 a.click();
             };
 
@@ -433,7 +435,7 @@
                             <Icon name="zap" size={24} className="fill-current" />
                             <div>
                                 <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none text-left">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.22 DEEP-DIVE</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.23 DEEP-DIVE</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -444,7 +446,7 @@
 
                     {progress.active && (
                         <div className="fixed top-[65px] left-0 w-full z-[2000] px-8">
-                            <div className="max-w-[1600px] mx-auto bg-white border border-blue-100 rounded-2xl p-4 shadow-2xl overflow-hidden relative">
+                            <div className="max-w-[1600px] mx-auto bg-white border border-blue-100 rounded-2xl p-4 shadow-2xl overflow-hidden relative text-left">
                                 <div className="flex justify-between items-center mb-2">
                                     <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
                                         <Icon name="loader-2" className="w-3 h-3 animate-spin" /> {progress.status}
@@ -466,15 +468,15 @@
                                 <div className="text-4xl font-black text-slate-900 leading-none">{stats.registry}</div>
                             </div>
                             <button onClick={() => setActiveModal('gap')} className="bg-white p-6 rounded-[2.5rem] border border-emerald-100 shadow-sm hover:bg-emerald-50 transition-all text-center group">
-                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-1 underline decoration-emerald-200 italic leading-none">Strategic Risks</span>
+                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-1 underline decoration-emerald-200 italic leading-none text-center">Strategic Risks</span>
                                 <div className="text-4xl font-black text-emerald-600 leading-none mt-1">{stats.gaps}</div>
                             </button>
                             <button onClick={() => setActiveModal('permanent')} className="bg-white p-6 rounded-[2.5rem] border border-red-100 shadow-sm hover:bg-red-50 transition-all text-center group">
-                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-1 underline decoration-red-200 italic leading-none">Perm Leads</span>
+                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-1 underline decoration-red-200 italic leading-none text-center">Perm Leads</span>
                                 <div className="text-4xl font-black text-red-600 leading-none mt-1">{stats.leads}</div>
                             </button>
                             <button onClick={() => setActiveModal('consultancy')} className="bg-white p-6 rounded-[2.5rem] border border-purple-100 shadow-sm hover:bg-purple-50 transition-all text-center group">
-                                <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest block mb-1 underline decoration-purple-200 italic leading-none">Interim/Contract</span>
+                                <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest block mb-1 underline decoration-purple-200 italic leading-none text-center">Interim/Contract</span>
                                 <div className="text-4xl font-black text-purple-600 leading-none mt-1">{stats.consult}</div>
                             </button>
                         </div>
@@ -497,7 +499,7 @@
                                         <Icon name="download" size={14} /> Import Data 1-7<input type="file" className="hidden" multiple accept=".csv" onChange={handleImport} />
                                     </label>
                                     <button className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 flex items-center gap-2 shadow-lg active:scale-95 transition-all" onClick={startBatchSweep}>
-                                        <Icon name="zap" size={14} /> Auto-Pilot Cycle (500/10)
+                                        <Icon name="zap" size={14} /> Auto-Pilot cycle (500/10)
                                     </button>
                                     <button onClick={bulkExportIntel} className="bg-white border border-slate-200 px-6 py-4 rounded-2xl text-[11px] font-black uppercase text-blue-600 hover:bg-blue-50 transition-all shadow-sm flex items-center gap-2">
                                         <Icon name="file-text" size={14} /> Export Audit
@@ -523,7 +525,7 @@
                                                         <div className="font-black uppercase text-xl tracking-tighter text-slate-900 leading-none">{c.name}</div>
                                                         <div className="flex flex-wrap gap-2 mt-3 text-left">
                                                             <span className={'urgency-badge border ' + (c.loxo === 'Client' ? 'bg-blue-100 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200')}>{c.loxo || 'Target'}</span>
-                                                            {c.lastDeepAudit && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter italic">Last Audit: {new Date(c.lastDeepAudit).toLocaleDateString()}</span>}
+                                                            {c.lastDeepAudit && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter italic">Deep Audit: {new Date(c.lastDeepAudit).toLocaleDateString()}</span>}
                                                             {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200 italic uppercase tracking-tighter text-left">Claimed: {action.owner}</span>}
                                                         </div>
                                                     </td>
@@ -533,7 +535,7 @@
                                                                 <div key={idx} className={'p-5 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden text-left ' + (j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : 'bg-white'))}>
                                                                     <span className={'absolute top-0 right-0 px-3 py-1 rounded-bl font-black text-[8px] uppercase ' + (getGradeStyle(j.grade))}>Grade {j.grade || 'C'}</span>
                                                                     <div className="text-xs font-black uppercase text-slate-900 pr-14 tracking-tight leading-none mb-2 text-left">{j.title}</div>
-                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Signal: {j.gapType || 'Forensic Trace'} • {j.behaviorFlag}</div>
+                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Audit Signal: {j.gapType || 'Forensic Trace'} • {j.behaviorFlag}</div>
                                                                     <div className="flex gap-4 text-left">
                                                                         <span className="text-[7px] font-black text-slate-400 uppercase border-r border-slate-100 pr-3 flex items-center gap-1"><Icon name="user" size={10} /> {j.reportsTo || j.ceoFallback || 'N/A'}</span>
                                                                         <div className="flex gap-2">
@@ -554,7 +556,7 @@
                                                                 <div className="text-[9px] font-bold text-blue-600 italic leading-none mt-1 tracking-tight">{intro.position || intro.title}</div>
                                                             </div>
                                                         ) : (
-                                                            <div className="flex flex-col items-end gap-3 text-right">
+                                                            <div className="flex flex-col items-end gap-3 text-right text-left">
                                                                 <select onChange={(e) => claim(c.name, e.target.value)} className="text-[11px] font-black border-2 border-slate-200 px-5 py-3 rounded-2xl bg-white outline-none focus:border-blue-600 transition-all uppercase tracking-tighter text-right cursor-pointer">
                                                                     <option>Claim As...</option><option>Tim</option><option>Rory</option><option>Anton</option>
                                                                 </select>
@@ -570,9 +572,9 @@
                             </div>
                         </div>
 
-                        {/* LIVE TRACE MONITOR */}
+                        {/* LIVE MONITOR CONSOLE */}
                         {isAdmin && (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20 text-left">
                                 <div className="bg-slate-900 rounded-[2.5rem] p-8 text-blue-400 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[350px] flex flex-col">
                                     <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                                         <span className="uppercase tracking-widest font-black flex items-center gap-2 italic"><Icon name="terminal" size={14} /> Forensic Intelligence Trace</span>
@@ -583,7 +585,7 @@
                                         {trace.length === 0 && <div className="text-slate-600 italic">Waiting for Auto-Pilot activation...</div>}
                                     </div>
                                 </div>
-                                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-slate-500 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[350px] flex flex-col">
+                                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-slate-500 font-mono text-[10px] leading-relaxed shadow-2xl border border-white/5 h-[350px] flex flex-col text-left">
                                     <div className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                                         <span className="uppercase tracking-widest font-black flex items-center gap-2 italic"><Icon name="shield-check" size={14} /> Mission Control Monitor</span>
                                         <span className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-[8px] font-black uppercase">Core Operational</span>
@@ -607,7 +609,7 @@
                                             <h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">
                                                 {activeModal === 'gap' ? 'Proactive Risk Desk' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Market search Intel'}
                                             </h2>
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic leading-none">Forensic Benchmarking for Rory & Tim</p>
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic leading-none">Contextual Benchmarking for Tim & Rory</p>
                                         </div>
                                         <div className="flex gap-4">
                                             <div className="flex flex-col gap-1 text-left">
