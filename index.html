@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.11 - Automation</title>
+    <title>Intelligence Hub V21.12 - Auto-Pilot</title>
     <!-- LIBS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -79,10 +79,10 @@
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="border-b border-slate-200">
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2">Organization</th>
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2">Opportunity / Signal</th>
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-center">Risk Grade</th>
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-1/3">Strategic Narrative</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2">Entity</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2">Role & Temporal Signal</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-center">Grade</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[40%]">Strategic Narrative</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-right px-2">Action</th>
                     </tr>
                 </thead>
@@ -94,14 +94,14 @@
                             <tr key={i} className={action ? 'opacity-40 grayscale' : ''}>
                                 <td className="py-6 px-2 font-black uppercase text-[11px] text-slate-900 leading-tight">
                                     {l.charity}
-                                    <div className="text-[7px] text-slate-400 font-bold mt-1 uppercase italic">Audit: {l.auditDate || 'New Discovery'}</div>
+                                    <div className="text-[7px] text-slate-400 font-bold mt-1 uppercase italic">Audit: {l.auditDate || 'New'}</div>
                                 </td>
                                 <td className="py-6 px-2">
-                                    <div className="font-bold text-[10px] text-blue-600 uppercase italic leading-none">{l.title}</div>
-                                    <div className="text-[8px] font-bold text-slate-400 mt-2 uppercase">Lead: {l.reportsTo || 'Searching...'}</div>
-                                    <div className="flex gap-2 mt-1">
-                                        <span className="text-[7px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-black uppercase">AD: {l.adDate || '??'}</span>
-                                        <span className="text-[7px] bg-red-50 px-2 py-0.5 rounded text-red-500 font-black uppercase tracking-tighter">END: {l.closingDate || '??'}</span>
+                                    <div className="font-bold text-[11px] text-blue-600 uppercase italic leading-none">{l.title}</div>
+                                    <div className="text-[8px] font-bold text-slate-400 mt-2 uppercase">Lead: {l.reportsTo || 'N/A'}</div>
+                                    <div className="flex gap-2 mt-2">
+                                        <span className="text-[7px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 font-black uppercase">AD: {l.adDate || '??'}</span>
+                                        <span className="text-[7px] bg-red-50 px-1.5 py-0.5 rounded text-red-500 font-black uppercase">CLOSE: {l.closingDate || '??'}</span>
                                     </div>
                                 </td>
                                 <td className="py-6 text-center">
@@ -110,7 +110,7 @@
                                 <td className="py-6 px-2 text-[10px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-6 text-left">
                                     <div className="font-bold text-slate-800 not-italic mb-1 uppercase text-[8px] tracking-widest">{l.gapType || 'Recruitment Insight'}</div>
                                     {l.behaviorFlag}
-                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none">Via: {l.source || 'Discovery'}</div>
+                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none">Source: {l.source || 'Discovery'}</div>
                                 </td>
                                 <td className="py-6 px-2 text-right">
                                     <div className="flex items-center justify-end gap-2 text-right">
@@ -118,7 +118,7 @@
                                             <Icon name="external-link" size={16} className="text-slate-400" />
                                         </a>
                                         {action ? (
-                                            <span className="text-[8px] font-black text-emerald-600 uppercase italic px-4">Claimed</span>
+                                            <span className="text-[8px] font-black text-emerald-600 uppercase italic px-4">Synced</span>
                                         ) : (
                                             <button onClick={() => onClaim(l.charity, 'Tim')} className="bg-blue-600 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase shadow-md hover:bg-blue-700">Sync</button>
                                         )}
@@ -142,7 +142,7 @@
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.11 Cyclical Batch Engine active.']);
+            const [logs, setLogs] = useState(['[SYSTEM] V21.12 Auto-Pilot online.']);
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             const [emailInput, setEmailInput] = useState('');
             
@@ -206,15 +206,11 @@
                                         reportsTo: r['reportsto'] || 'CEO',
                                         grade: r['agencyscore'] ? 'A' : 'B',
                                         type: (r['salary'] || '').toLowerCase().includes('day') ? 'consultancy' : 'permanent',
-                                        behaviorFlag: r['detailedreason'] || r['reason'] || 'Archive match found.',
+                                        behaviorFlag: r['detailedreason'] || r['reason'] || 'Archive artifact.',
                                         source: 'History'
                                     }]
                                 }));
-                                setIntel(prev => {
-                                    const next = [...historical, ...prev];
-                                    localStorage.setItem('hub_intel', JSON.stringify(next));
-                                    return next;
-                                });
+                                setIntel(prev => [...historical, ...prev]);
                             } else {
                                 const isLeads = (s['job title'] || s['title']);
                                 if (isLeads) {
@@ -229,11 +225,7 @@
                                             behaviorFlag: r['note'] || 'Discovery artifact.', source: 'Import'
                                         }]
                                     }));
-                                    setIntel(prev => {
-                                        const next = [...active, ...prev];
-                                        localStorage.setItem('hub_intel', JSON.stringify(next));
-                                        return next;
-                                    });
+                                    setIntel(prev => [...active, ...prev]);
                                 } else {
                                     const newReg = [...registry];
                                     data.forEach(r => {
@@ -243,14 +235,14 @@
                                         if (idx > -1) {
                                             newReg[idx].loxo = (r['loxo status'] === 'Client' ? 'Client' : newReg[idx].loxo);
                                         } else {
-                                            newReg.push({ name: n, id: r['charity number'], loxo: (r['loxo status'] || 'Target'), lastAuditDate: null });
+                                            newReg.push({ name: n, id: r['charity number'], loxo: (r['loxo status'] || 'Target'), lastGeneralSweep: null, lastDeepAudit: null });
                                         }
                                     });
                                     setRegistry(newReg); localStorage.setItem('hub_registry', JSON.stringify(newReg));
                                 }
                             }
                             currentFileIndex++;
-                            setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Layering ' + file.name });
+                            setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Syncing Layer ' + file.name });
                             setTimeout(processNextFile, 100);
                         } catch (err) { currentFileIndex++; processNextFile(); }
                     };
@@ -282,58 +274,93 @@
                 const id = n.replace(/[^a-zA-Z0-9]/g, '-');
                 const upd = { ...teamActions, [id]: { owner: u, date: new Date().toISOString() } };
                 setTeamActions(upd); localStorage.setItem('hub_actions', JSON.stringify(upd));
-                addLog(u + ' actioned: ' + n);
+                addLog(u + ' claimed: ' + n);
             };
 
-            const runGrounding = async (name) => {
+            const runGrounding = async (name, mode = 'deep') => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
-                setProgress({ active: true, percent: 10, status: 'Strategic Investigative Research...' });
-                addLog('Investigating ' + name + ' pain points...');
-                
-                const prompt = "Investigate " + name + " (UK Charity). Search requirements: " +
-                               "1. VACANCIES: Cross-reference CharityJob, ThirdSector, Guardian, Bond, indeed, Fundraising.co.uk, NCVO, ACEVO, LinkedIn. Separate Perm vs Consultancy/Interim. " +
-                               "2. DATES: Extract role 'POST DATE' and 'CLOSING DATE' for each vacancy found. " +
-                               "3. INCOME GAPS: Audit Charity Commission. Is legacy <5% of voluntary income? Over-reliance on statutory (>70%)? GiK vs Cash Fundraising staff imbalance? " +
-                               "4. STRATEGIC RISK: Scan for 'Section 114', 'decommissioning', 'redundancy consultation', 'MTFS savings', 'ICB cuts', 'stagnant board'. " +
-                               "Return JSON ONLY: {\"jobs\": [{\"title\": \"Lead Title\", \"adDate\": \"DD/MM/YYYY\", \"closingDate\": \"DD/MM/YYYY\", \"link\": \"url\", \"grade\": \"A|B|C\", \"type\": \"permanent|consultancy|gap\", \"gapType\": \"Legacy|Risk|Crisis|Culture\", \"behaviorFlag\": \"Why this is a win\", \"reportsTo\": \"Mgr Name\", \"source\": \"Source Name\"}]}";
+                const promptDeep = "Investigate UK Charity " + name + ". REQUIREMENTS: " +
+                                   "1. VACANCIES: CharityJob, Guardian, Bond, ThirdSector. Extract Permanent vs Consultancy. " +
+                                   "2. DATES: Find 'Ad Post Date' and 'Application Closing Date'. " +
+                                   "3. GAPS: Audit Charity Commission. Legacy <5% vs IG total? Statutory reliance >70%? Financial Decline? " +
+                                   "4. RISK: Section 114, decommissioning, MTFS cuts, toxic culture, DMARC fail. " +
+                                   "Return JSON ONLY: {\"jobs\": [{\"title\": \"Lead\", \"adDate\": \"DD/MM\", \"closingDate\": \"DD/MM\", \"link\": \"url\", \"grade\": \"A|B|C\", \"type\": \"permanent|consultancy|gap\", \"gapType\": \"Risk Category\", \"behaviorFlag\": \"Strategic narrative\", \"reportsTo\": \"Mgr\"}]}";
+
+                const promptPulse = "Identify if " + name + " has ANY active fundraising vacancies live online today. Just return 'YES' + JSON with titles and links if active. JSON ONLY: {\"active\": boolean, \"jobs\": []}";
+
+                const prompt = mode === 'deep' ? promptDeep : promptPulse;
 
                 try {
-                    setProgress({ active: true, percent: 40, status: 'Auditing Board sites & Commission data...' });
                     const res = await fetch(API_BASE + "?key=" + keys.gemini, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ "google_search": {} }] })
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: mode === 'deep' ? [{ "google_search": {} }] : [] })
                     });
-                    setProgress({ active: true, percent: 80, status: 'Scanning Social & Cultural sentiment...' });
                     const data = await res.json();
                     const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{\"jobs\": []}";
                     const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
                     
-                    if (parsed.jobs) {
+                    if (parsed.jobs && parsed.jobs.length > 0) {
                         const updated = [{ charityName: name, foundAt: new Date().toLocaleDateString(), jobs: parsed.jobs }, ...intel];
                         setIntel(updated);
                         localStorage.setItem('hub_intel', JSON.stringify(updated));
-                        
-                        // Update Registry with Audit Date
-                        setRegistry(prev => {
-                            const next = prev.map(c => c.name === name ? { ...c, lastAuditDate: new Date().toLocaleDateString() } : c);
-                            localStorage.setItem('hub_registry', JSON.stringify(next));
-                            return next;
-                        });
-
-                        addLog('Intelligence Mapped: ' + name);
+                        addLog((mode === 'deep' ? 'Forensic Audit' : 'Pulse Scan') + ' Secured: ' + name);
                     }
-                    setProgress({ active: false, percent: 0, status: '' });
-                } catch (err) {
-                    addLog('Research Error for ' + name);
-                    setProgress({ active: false, percent: 0, status: '' });
+
+                    // Update Registry Timestamps
+                    setRegistry(prev => {
+                        const next = prev.map(c => c.name === name ? { ...c, [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toLocaleDateString() } : c);
+                        localStorage.setItem('hub_registry', JSON.stringify(next));
+                        return next;
+                    });
+                } catch (err) { addLog('Logic stall for ' + name); }
+            };
+
+            const startBatchSweep = async () => {
+                if (!keys.gemini) { setActiveModal('settings'); return; }
+                
+                // 1. PHASE ONE: General Sweep (500)
+                const pulseBatchSize = 500;
+                const pulseTargets = [...registry]
+                    .filter(c => !c.lastGeneralSweep)
+                    .slice(0, pulseBatchSize);
+
+                if (pulseTargets.length > 0) {
+                    addLog('Phase 1/2: High-Volume Pulse Scan (' + pulseTargets.length + ' targets)...');
+                    setProgress({ active: true, percent: 10, status: 'Scanning 500 Targets (Pulse Phase)...' });
+                    // Note: In browser environment we batch them to avoid crash
+                    for(let i=0; i<pulseTargets.length; i+=10) {
+                       setProgress({ active: true, percent: Math.round((i/pulseTargets.length)*50), status: 'General Sweep: ' + (i+1) + '/' + pulseTargets.length });
+                       await Promise.all(pulseTargets.slice(i, i+10).map(t => runGrounding(t.name, 'pulse')));
+                    }
                 }
+
+                // 2. PHASE TWO: Forensic Deep Audit (10)
+                const auditBatchSize = 10;
+                const auditTargets = [...registry]
+                    .sort((a, b) => {
+                        if (!a.lastDeepAudit) return -1;
+                        return new Date(a.lastDeepAudit) - new Date(b.lastDeepAudit);
+                    })
+                    .slice(0, auditBatchSize);
+
+                addLog('Phase 2/2: Forensic Deep Audit (Next ' + auditTargets.length + ' targets)...');
+                for (let i = 0; i < auditTargets.length; i++) {
+                    const char = auditTargets[i];
+                    setProgress({ active: true, percent: 50 + Math.round(((i + 1) / auditTargets.length) * 50), status: 'Deep Audit: ' + char.name });
+                    await runGrounding(char.name, 'deep');
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+
+                addLog('Dual-Stage Sweep Complete.');
+                setProgress({ active: true, percent: 100, status: 'Automation Finalized.' });
+                setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
             };
 
             const handleEmailParse = async () => {
                 if (!emailInput.trim() || !keys.gemini) return;
                 setProgress({ active: true, percent: 10, status: 'Parsing Intel Feed...' });
-                const prompt = "Extract leads (>£40k) from alert. Delineate Perm vs Consultancy. Return JSON ONLY: {\"jobs\": [{\"title\": \"Role\", \"charity\": \"Name\", \"type\": \"permanent|consultancy\", \"link\": \"url\", \"adDate\": \"DD/MM\", \"closingDate\": \"DD/MM\"}]}. Text: " + emailInput;
+                const prompt = "Extract leads (>£40k) from alert. Delineate Perm vs Consultancy. Find post/closing dates. JSON ONLY: {\"jobs\": [{\"title\": \"Role\", \"charity\": \"Name\", \"type\": \"permanent|consultancy\", \"link\": \"url\", \"adDate\": \"DD/MM\", \"closingDate\": \"DD/MM\"}]}. Text: " + emailInput;
                 try {
                     const res = await fetch(API_BASE + "?key=" + keys.gemini, {
                         method: "POST", headers: { "Content-Type": "application/json" },
@@ -343,40 +370,13 @@
                     const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{\"jobs\": []}";
                     const parsed = JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
                     if (parsed.jobs) {
-                        const formatted = parsed.jobs.map(j => ({ charityName: j.charity, foundAt: new Date().toLocaleDateString(), jobs: [{ ...j, behaviorFlag: 'Email Alert Lead', reportsTo: 'Unknown', grade: 'B' }] }));
+                        const formatted = parsed.jobs.map(j => ({ charityName: j.charity, foundAt: new Date().toLocaleDateString(), jobs: [{ ...j, behaviorFlag: 'Email Intelligence Intake', reportsTo: 'Recruiter', grade: 'B' }] }));
                         setIntel(prev => [...formatted, ...prev]);
                         addLog('Imported ' + parsed.jobs.length + ' leads from Intel Feed.');
                     }
                     setEmailInput('');
                     setProgress({ active: false, percent: 0, status: '' });
                 } catch (err) { setProgress({ active: false, percent: 0, status: '' }); }
-            };
-
-            const startBatchSweep = async () => {
-                if (!keys.gemini) { setActiveModal('settings'); return; }
-                
-                // CYCLICAL ENGINE: Pick 10 that haven't been audited or have the oldest audits
-                const batchSize = 10;
-                const targets = [...registry]
-                    .sort((a, b) => {
-                        if (!a.lastAuditDate) return -1;
-                        if (!b.lastAuditDate) return 1;
-                        return new Date(a.lastAuditDate) - new Date(b.lastAuditDate);
-                    })
-                    .slice(0, batchSize);
-
-                if (targets.length === 0) { addLog('Registry empty. Upload Master List.'); return; }
-                
-                addLog('Automated Daily Sweep: Initiating investigation of next ' + targets.length + ' targets...');
-                for (let i = 0; i < targets.length; i++) {
-                    const char = targets[i];
-                    setProgress({ active: true, percent: Math.round(((i + 1) / targets.length) * 100), status: 'Investigating ' + char.name });
-                    await runGrounding(char.name);
-                    await new Promise(r => setTimeout(r, 2000));
-                }
-                addLog('Daily cyclical sweep complete.');
-                setProgress({ active: true, percent: 100, status: 'Audit Finalized.' });
-                setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
             };
 
             return (
@@ -386,7 +386,7 @@
                             <Icon name="zap" size={24} className="fill-current" />
                             <div>
                                 <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.11 AUTOMATION</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.12 AUTO-PILOT</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -397,7 +397,7 @@
 
                     {progress.active && (
                         <div className="fixed top-[65px] left-0 w-full z-[2000] px-8">
-                            <div className="max-w-7xl mx-auto bg-white border border-blue-100 rounded-2xl p-4 shadow-xl overflow-hidden">
+                            <div className="max-w-[1600px] mx-auto bg-white border border-blue-100 rounded-2xl p-4 shadow-xl overflow-hidden">
                                 <div className="flex justify-between items-center mb-2">
                                     <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
                                         <Icon name="loader-2" className="w-3 h-3 animate-spin" /> {progress.status}
@@ -411,10 +411,10 @@
                         </div>
                     )}
 
-                    <main className="max-w-7xl mx-auto w-full p-8 flex-1">
+                    <main className="max-w-[1600px] mx-auto w-full p-8 flex-1">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 text-center">
                             <div className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm text-center">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none block mb-1">Total Targets</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Entity Registry</span>
                                 <div className="text-4xl font-black text-slate-900 leading-none">{stats.registry}</div>
                             </div>
                             <button onClick={() => setActiveModal('gap')} className="bg-white p-6 rounded-[2.5rem] border border-emerald-100 shadow-sm hover:bg-emerald-50 transition-all text-center group">
@@ -435,14 +435,14 @@
                             <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/30 text-left">
                                 <div className="flex-1 max-w-md relative text-left">
                                     <Icon name="search" size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" />
-                                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search Entity, Risk Indicator, or Connection..." className="w-full bg-white px-14 py-4 rounded-2xl border border-slate-200 outline-none text-sm font-medium focus:ring-4 ring-blue-50 transition-all" />
+                                    <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search Entity, Risk Indicator, or Contact..." className="w-full bg-white px-14 py-4 rounded-2xl border border-slate-200 outline-none text-sm font-medium focus:ring-4 ring-blue-50 transition-all" />
                                 </div>
                                 {isAdmin && (<div className="flex items-center gap-3">
                                     <label className="cursor-pointer bg-slate-900 text-white px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl flex items-center gap-2">
                                         <Icon name="download" size={14} /> Import Data 1-7<input type="file" className="hidden" multiple accept=".csv" onChange={handleImport} />
                                     </label>
-                                    <button className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 flex items-center gap-2" onClick={startBatchSweep}>
-                                        <Icon name="zap" size={14} /> Daily Deep Sweep (10)
+                                    <button className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 flex items-center gap-2 shadow-lg" onClick={startBatchSweep}>
+                                        <Icon name="zap" size={14} /> Auto-Pilot Sweep (500 Pulse / 10 Deep)
                                     </button>
                                     <button onClick={resetMemory} className="text-[10px] font-black uppercase text-red-400 hover:text-red-600 ml-4 flex items-center gap-1">
                                         <Icon name="trash-2" size={12} /> Reset
@@ -453,10 +453,10 @@
                             {isAdmin && (
                                 <div className="p-8 bg-blue-50/50 border-b border-slate-100">
                                     <div className="flex flex-col gap-3 text-left">
-                                        <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest italic flex items-center gap-2"><Icon name="mail" size={12} /> Intelligence Intake Feed</label>
+                                        <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest italic flex items-center gap-2"><Icon name="mail" size={12} /> Intelligence Feed Intake</label>
                                         <div className="flex gap-4 text-left">
-                                            <textarea value={emailInput} onChange={(e) => setEmailInput(e.target.value)} placeholder="Paste daily job board alert text here..." className="flex-1 p-4 rounded-xl border border-blue-100 bg-white text-xs outline-none focus:ring-4 ring-blue-50 transition-all h-20 custom-scrollbar"></textarea>
-                                            <button onClick={handleEmailParse} className="bg-blue-600 text-white px-8 rounded-xl font-black uppercase text-[10px] hover:bg-blue-700 transition-all active:scale-95 shadow-lg">Parse Intel</button>
+                                            <textarea value={emailInput} onChange={(e) => setEmailInput(e.target.value)} placeholder="Paste daily job board alerts here (Guardian, CharityJob, etc.)..." className="flex-1 p-4 rounded-xl border border-blue-100 bg-white text-xs outline-none focus:ring-4 ring-blue-50 transition-all h-20 custom-scrollbar"></textarea>
+                                            <button onClick={handleEmailParse} className="bg-blue-600 text-white px-8 rounded-xl font-black uppercase text-[10px] hover:bg-blue-700 transition-all active:scale-95 shadow-lg">Parse Feed</button>
                                         </div>
                                     </div>
                                 </div>
@@ -477,7 +477,7 @@
                                                         <div className="font-black uppercase text-xl tracking-tighter text-slate-900 leading-none">{c.name}</div>
                                                         <div className="flex flex-wrap gap-2 mt-3 text-left">
                                                             <span className={'urgency-badge border ' + (c.loxo === 'Client' ? 'bg-blue-100 text-blue-600 border-blue-200' : 'bg-white text-slate-400 border-slate-200')}>{c.loxo || 'Target'}</span>
-                                                            {c.lastAuditDate && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter">Last Sweep: {c.lastAuditDate}</span>}
+                                                            {c.lastDeepAudit && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter">Audit: {c.lastDeepAudit}</span>}
                                                             {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200 italic uppercase tracking-tighter">Claimed: {action.owner}</span>}
                                                         </div>
                                                     </td>
@@ -487,14 +487,15 @@
                                                                 <div key={idx} className={'p-5 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden ' + (j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : 'bg-white'))}>
                                                                     <span className={'absolute top-0 right-0 px-3 py-1 rounded-bl font-black text-[8px] uppercase ' + (getGradeStyle(j.grade))}>Grade {j.grade || 'C'}</span>
                                                                     <div className="text-xs font-black uppercase text-slate-900 pr-14 tracking-tight leading-none mb-2 text-left">{j.title}</div>
-                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic">Signal: {j.gapType || 'Manual Lead'} • {j.behaviorFlag}</div>
-                                                                    <div className="flex gap-2 text-left">
-                                                                        <span className="text-[8px] font-black text-slate-400 uppercase border-r border-slate-100 pr-2">Ad: {j.adDate || '??'}</span>
-                                                                        <span className="text-[8px] font-black text-red-400 uppercase">Closes: {j.closingDate || '??'}</span>
+                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic">Signal: {j.gapType || 'Active Discovery'} • {j.behaviorFlag}</div>
+                                                                    <div className="flex gap-3 text-left">
+                                                                        <span className="text-[7px] font-black text-slate-400 uppercase border-r border-slate-100 pr-3">Contact: {j.reportsTo || 'N/A'}</span>
+                                                                        <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter">Ad: {j.adDate || '??'}</span>
+                                                                        <span className="text-[7px] font-black text-red-500 uppercase tracking-tighter">End: {j.closingDate || '??'}</span>
                                                                     </div>
                                                                 </div>
                                                             ))}
-                                                            {jobs.length === 0 && <div className="text-[9px] text-slate-300 italic uppercase font-bold flex items-center gap-2"><Icon name="briefcase" size={12} /> Pending deep strategic audit</div>}
+                                                            {jobs.length === 0 && <div className="text-[9px] text-slate-300 italic uppercase font-bold flex items-center gap-2"><Icon name="briefcase" size={12} /> Pending Auto-Pilot scan</div>}
                                                         </div>
                                                     </td>
                                                     <td className="px-10 py-10 text-right">
@@ -509,7 +510,7 @@
                                                                 <select onChange={(e) => claim(c.name, e.target.value)} className="text-[11px] font-black border-2 border-slate-200 px-5 py-3 rounded-2xl bg-white outline-none focus:border-blue-600 transition-all uppercase tracking-tighter text-right cursor-pointer">
                                                                     <option>Claim As...</option><option>Tim</option><option>Rory</option><option>Anton</option>
                                                                 </select>
-                                                                <button onClick={() => runGrounding(c.name)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all flex items-center justify-end gap-2 px-2">Investigate Risk <Icon name="chevron-right" size={12} /></button>
+                                                                <button onClick={() => runGrounding(c.name, 'deep')} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all flex items-center justify-end gap-2 px-2">Investigate Risks <Icon name="chevron-right" size={12} /></button>
                                                             </div>
                                                         )}
                                                     </td>
@@ -532,9 +533,9 @@
                     {/* Modal Desks */}
                     {activeModal && activeModal !== 'settings' && (
                         <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[5000] p-4 md:p-10 flex items-center justify-center text-left">
-                            <div className="bg-white rounded-[4rem] shadow-2xl w-full h-full max-w-7xl flex flex-col overflow-hidden relative border border-white/20">
+                            <div className="bg-white rounded-[4rem] shadow-2xl w-full h-full max-w-[1600px] flex flex-col overflow-hidden relative border border-white/20">
                                 <button onClick={() => setActiveModal(null)} className="absolute top-8 right-8 p-4 bg-slate-100 rounded-full hover:bg-slate-200 transition-all z-[10] shadow-sm"><Icon name="x" size={20} className="text-slate-900" /></button>
-                                <div className="p-10 border-b border-slate-100 bg-slate-50/50"><h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">{activeModal === 'gap' ? 'Proactive Risk Desk' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active search Intel'}</h2><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic">Temporal intelligence for agency targeting</p></div>
+                                <div className="p-10 border-b border-slate-100 bg-slate-50/50 text-left"><h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">{activeModal === 'gap' ? 'Proactive Risk Desk' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active search Intel'}</h2><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic">Deep temporal intelligence for agency targeting</p></div>
                                 <div className="flex-1 overflow-auto custom-scrollbar p-10 text-left"><DeskTable items={deskItems} teamActions={teamActions} onClaim={claim} /></div>
                             </div>
                         </div>
