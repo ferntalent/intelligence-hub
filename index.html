@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.28 - Forensic Build</title>
+    <title>Intelligence Hub V21.29 - Forensic Build</title>
     <!-- FAVICON (Inverted: Emerald Brand) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2310b981%22/><path d=%22M50 15L25 55H45L35 85L75 45H55L65 15H50Z%22 fill=%22white%22/></svg>">
     <!-- PRODUCTION LIBS -->
@@ -18,7 +18,7 @@
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .urgency-badge { padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 900; text-transform: uppercase; border: 1px solid transparent; }
+        .urgency-badge { padding: 4px 10px; border-radius: 9999px; font-size: 10px; font-weight: 900; text-transform: uppercase; border: 1px solid transparent; }
         .grade-a { background-color: #ef4444; color: white; border-color: #fee2e2; }
         .grade-b { background-color: #f97316; color: white; }
         .grade-c { background-color: #10b981; color: white; }
@@ -33,8 +33,8 @@
 </head>
 <body class="p-4 md:p-8 text-left selection:bg-emerald-100">
     <div id="boot-loader">
-        <div class="font-black text-slate-400 uppercase tracking-widest text-[10px] italic animate-pulse mb-4 text-center">
-            Initializing Forensic Hub V21.28...
+        <div class="font-black text-slate-400 uppercase tracking-widest text-[11px] italic animate-pulse mb-4 text-center">
+            Initializing Intelligence Hub V21.29 (Systematic Load)...
         </div>
     </div>
     <div id="root"></div>
@@ -109,46 +109,46 @@
                                         <span className="text-[7px] text-emerald-600 font-bold uppercase">{l.cause || 'Sector Registry'}</span>
                                         <span className="text-[7px] text-slate-400 font-bold uppercase border-l border-slate-200 pl-1">{l.location || 'UK HQ'}</span>
                                     </div>
-                                    <div className="text-[6px] text-slate-300 font-bold mt-1 uppercase italic tracking-tighter">Audit Sync: {l.auditDate || 'Pending'}</div>
+                                    <div className="text-[7px] text-slate-300 font-bold mt-1 uppercase italic tracking-tighter">Audit Trace: {l.auditDate || 'Recently Synchronized'}</div>
                                 </td>
                                 <td className="py-6 px-2">
                                     <div className="font-bold text-[11px] text-emerald-600 uppercase italic leading-none">{l.title || 'Signal Trace'}</div>
-                                    <div className="flex gap-2 mt-2">
-                                        <div className="flex flex-col bg-slate-50 px-2 py-1 rounded">
-                                            <span className="text-[5px] font-black text-slate-400 uppercase tracking-tighter">ADVERT POSTED</span>
-                                            <span className="text-[9px] text-slate-600 font-black uppercase">{l.adDate || '??/??'}</span>
+                                    <div className="flex gap-2 mt-3">
+                                        <div className="flex flex-col bg-slate-900 text-white px-2 py-1.5 rounded-lg shadow-sm border border-slate-700">
+                                            <span className="text-[6px] font-black uppercase tracking-widest opacity-80">AD POSTED</span>
+                                            <span className="text-[10px] font-black uppercase">{l.adDate || 'LIVE NOW'}</span>
                                         </div>
-                                        <div className="flex flex-col bg-red-50 px-2 py-1 rounded border border-red-100">
-                                            <span className="text-[5px] font-black text-red-400 uppercase tracking-tighter">CLOSING DATE</span>
-                                            <span className="text-[9px] text-red-600 font-black uppercase italic">{l.closingDate || '??/??'}</span>
+                                        <div className="flex flex-col bg-red-600 text-white px-2 py-1.5 rounded-lg shadow-sm border border-red-500">
+                                            <span className="text-[6px] font-black uppercase tracking-widest opacity-80">CLOSING DATE</span>
+                                            <span className="text-[10px] font-black uppercase italic">{l.closingDate || '??/??'}</span>
                                         </div>
                                     </div>
-                                    <div className="mt-2 text-[8px] font-black text-slate-400 uppercase italic">Salary: {l.salary || 'Competitive'}</div>
+                                    <div className="mt-3 text-[10px] font-black text-slate-800 uppercase italic bg-slate-100 px-2 py-1 rounded inline-block">Salary: {l.salary || 'Competitive'}</div>
                                 </td>
                                 <td className="py-6 text-center">
                                     <span className={'urgency-badge ' + getGradeStyle(l.grade)}>{l.grade === 'A' ? 'CRITICAL' : l.grade === 'B' ? 'STRATEGIC' : 'MONITOR'}</span>
                                 </td>
-                                <td className="py-6 px-2 text-[10px] font-medium leading-relaxed italic text-slate-500 border-l border-slate-50 pl-6 text-left">
-                                    <div className="bg-slate-900 text-white inline-block px-3 py-1 rounded text-[8px] font-black uppercase mb-3 tracking-widest shadow-sm">
+                                <td className="py-6 px-2 text-[11px] font-medium leading-relaxed italic text-slate-600 border-l-2 border-slate-100 pl-6 text-left">
+                                    <div className="bg-slate-200 text-slate-900 inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase mb-3 tracking-widest shadow-sm">
                                         REPORTS TO: {l.reportsTo || (l.ceoFallback ? l.ceoFallback : 'STAKEHOLDER SEARCHING...')}
                                     </div>
-                                    <div className="font-bold text-slate-800 not-italic mb-1 uppercase text-[9px] tracking-widest text-blue-600 flex items-center gap-2">
-                                        <Icon name="target" size={12} /> {l.gapType || 'Forensic Insight'}
+                                    <div className="font-black text-slate-900 not-italic mb-2 uppercase text-[10px] tracking-widest text-blue-600 flex items-center gap-2">
+                                        <Icon name="target" size={14} /> {l.gapType || 'Forensic Intelligence'}
                                     </div>
-                                    <div className="text-slate-600 font-medium">
-                                        {l.behaviorFlag || 'No strategic red flags detected in current filing cycle.'}
+                                    <div className="text-slate-800 font-semibold leading-normal mb-3 border-b border-slate-50 pb-2">
+                                        {l.behaviorFlag || 'Automated risk and vacancy discovery.'}
                                     </div>
-                                    <div className="mt-3 text-[8px] font-black text-emerald-600 uppercase tracking-widest leading-none italic opacity-60">Trace Source: {l.source || 'Intelligence Feed'}</div>
+                                    <div className="mt-2 text-[9px] font-black text-emerald-600 uppercase tracking-widest leading-none italic opacity-80">Trace Source: {l.source || 'Intelligence Feed'}</div>
                                 </td>
                                 <td className="py-6 px-2 text-right">
                                     <div className="flex items-center justify-end gap-2 text-right">
-                                        <a href={l.link || '#'} target="_blank" rel="noopener noreferrer" className="p-3 bg-slate-100 rounded-2xl hover:bg-slate-200 transition-all shadow-sm">
-                                            <Icon name="external-link" size={16} className="text-slate-400" />
+                                        <a href={l.link || '#'} target="_blank" rel="noopener noreferrer" className="p-4 bg-slate-100 rounded-2xl hover:bg-slate-200 transition-all shadow-md group">
+                                            <Icon name="external-link" size={20} className="text-slate-400 group-hover:text-emerald-600" />
                                         </a>
                                         {action ? (
-                                            <span className="text-[8px] font-black text-emerald-600 uppercase italic px-4 tracking-tighter">Synced</span>
+                                            <span className="text-[10px] font-black text-emerald-600 uppercase italic px-6 bg-emerald-50 py-3 rounded-2xl border border-emerald-100 shadow-inner">SYNCED</span>
                                         ) : (
-                                            <button onClick={() => onClaim(l.charity, 'Tim', l.reportsTo || l.ceoFallback)} className="bg-emerald-600 text-white text-[9px] font-black px-5 py-3 rounded-xl uppercase shadow-lg hover:bg-emerald-700 active:scale-95 transition-all tracking-tighter">Sync Stakeholder</button>
+                                            <button onClick={() => onClaim(l.charity, 'Tim', l.reportsTo || l.ceoFallback)} className="bg-emerald-600 text-white text-[10px] font-black px-6 py-4 rounded-2xl uppercase shadow-xl hover:bg-emerald-700 active:scale-95 transition-all tracking-tighter">Sync Stakeholder</button>
                                         )}
                                     </div>
                                 </td>
@@ -169,7 +169,7 @@
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.28 Inverted Identity Build active. Favicon deployed.']);
+            const [logs, setLogs] = useState(['[SYSTEM] V21.29 Intelligence Build active. Lead visibility restored.']);
             const [trace, setTrace] = useState([]); 
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             const [leadFilters, setLeadFilters] = useState({ cause: 'all', location: 'all' });
@@ -197,7 +197,7 @@
             const addTrace = useCallback((m) => setTrace(p => [m, ...p].slice(0, 25)), []);
 
             const resetMemory = () => {
-                if (window.confirm("Confirm: Clear entire database?")) {
+                if (window.confirm("Confirm Reset: This will wipe all leads and registry items.")) {
                     localStorage.clear();
                     window.location.reload();
                 }
@@ -230,9 +230,9 @@
                                 return obj;
                             });
 
-                            const isLeads = headers.includes('closing date') || headers.includes('job title');
-                            const isHistory = headers.includes('agencyscore') || headers.includes('detailedreason') || headers.includes('reportstoname');
-                            const isLoxo = headers.includes('owner') || headers.includes('loxo status');
+                            const isLeads = headers.includes('closing date') || headers.includes('note');
+                            const isHistory = headers.includes('agencyscore') || headers.includes('reportstoname');
+                            const isLoxo = headers.includes('loxo status');
                             const isSchools = headers.includes('establishmentname');
                             const isLinkedIn = headers.includes('first name') && headers.includes('company');
 
@@ -240,29 +240,28 @@
                                 const historical = data.map(r => ({
                                     charityName: r['charity'] || r['organisation'] || r['entity_name'],
                                     jobs: [{
-                                        title: r['jobtitle'] || r['job title'] || 'History Trace',
+                                        title: r['jobtitle'] || r['job title'] || 'History Lead',
                                         salary: r['salary'] || 'TBC',
                                         link: r['link'] || r['directlink'] || '#',
-                                        since: r['tenuresince'] || 'History',
+                                        since: r['tenuresince'] || 'Archive',
                                         reportsTo: r['reportstoname'] || r['reportsto'] || 'CEO',
                                         grade: r['agencyscore'] ? 'A' : 'B',
                                         type: 'permanent',
-                                        behaviorFlag: r['detailedreason'] || r['reason'] || 'Archive artifact.',
-                                        source: 'Strategic Archive'
+                                        behaviorFlag: r['detailedreason'] || r['reason'] || 'Historical Trace.',
+                                        source: 'Strategic History'
                                     }]
                                 }));
                                 setIntel(prev => {
                                     const merged = [...prev];
-                                    historical.forEach(h => { if (!merged.some(m => cleanName(m.charityName) === cleanName(h.charityName) && m.jobs[0].title === h.jobs[0].title)) merged.unshift(h); });
+                                    historical.forEach(h => {
+                                        if (!merged.some(m => cleanName(m.charityName) === cleanName(h.charityName) && m.jobs[0].title === h.jobs[0].title)) merged.unshift(h);
+                                    });
                                     return merged;
                                 });
-                                addLog(`Merged History: ${file.name}`);
                             } else if (isLinkedIn) {
                                 setConnections(data); localStorage.setItem('hub_connections', JSON.stringify(data));
-                                addLog(`Network: ${file.name}`);
                             } else if (isSchools) {
                                 setSchools(data); localStorage.setItem('hub_schools', JSON.stringify(data));
-                                addLog(`IDPE: ${file.name}`);
                             } else if (isLeads) {
                                 const activeLeads = data.map(r => ({
                                     charityName: r['organisation'] || r['charity'] || r['organisation_name'],
@@ -271,7 +270,7 @@
                                         link: r['link'] || r['url'], type: 'permanent',
                                         adDate: r['ad_date'] || r['advertised_since'] || '??/??',
                                         closingDate: r['closing date'] || r['closing_date'] || '??/??',
-                                        behaviorFlag: r['note'] || 'Market discovery lead.', source: 'Direct Intake'
+                                        behaviorFlag: r['note'] || 'Live Lead Discovery.', source: 'Direct Intake'
                                     }]
                                 }));
                                 setIntel(prev => {
@@ -279,7 +278,6 @@
                                     activeLeads.forEach(al => { if (!merged.some(m => m.jobs[0].link === al.jobs[0].link)) merged.unshift(al); });
                                     return merged;
                                 });
-                                addLog(`Active Leads: ${file.name}`);
                             } else {
                                 setRegistry(prev => {
                                     const newReg = [...prev];
@@ -291,8 +289,7 @@
                                         const idx = newReg.findIndex(m => cleanName(m.name) === cleanName(n));
                                         if (idx === -1) {
                                             newReg.push({ 
-                                                name: n, 
-                                                id: r['charity number'] || r['number'] || r['entity_id'], 
+                                                name: n, id: r['charity number'] || r['number'] || r['entity_id'], 
                                                 loxo: (r['loxo status'] || (isLoxo ? 'Client' : 'Target')), 
                                                 cause: r['what the charity does'] || r['cause'] || r['how the charity helps'] || 'Sector',
                                                 location: r['location'] || r['region'] || r['head_office_location'] || 'UK',
@@ -302,7 +299,6 @@
                                     });
                                     return newReg;
                                 });
-                                addLog(`Registry Layer: ${file.name}`);
                             }
                             currentFileIndex++;
                             setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Mapping ' + file.name });
@@ -351,15 +347,15 @@
 
             const runGrounding = async (name, mode = 'deep') => {
                 if (!keys.gemini) { setActiveModal('settings'); return; }
-                addTrace(`SCRAPING: UK Boards & Commission Filings for ${name}...`);
+                addTrace(`PHASE 1: Scraping UK Boards & Commission Filings for ${name}...`);
                 
-                const promptDeep = `STRICT FINANCIAL FORENSICS PROTOCOL: ${name}.
-                    1. AUDIT MANDATE: Scrape Charity Commission filings. Extract Total Voluntary Income vs Legacy Income.
-                    2. NUMERICAL BENCHMARK: If Legacy < 5% of Voluntary Income, you MUST flag as a "Strategy Gap".
-                    3. VACANCIES: Search boards and 'vacancies' subdomains. Hunt for 'Interim', 'Day rate', 'Maternity', 'Contract'.
-                    4. DATES: ALWAYS extract 'Ad Posted Date' and 'Closing Date'.
-                    5. STAKEHOLDER: Find CEO Name.
-                    JSON ONLY: {"jobs": [{"title": "Forensic Signal", "adDate": "DD/MM", "closingDate": "DD/MM", "link": "url", "grade": "A|B|C", "type": "permanent|consultancy|gap", "gapType": "Legacy Gap|Crisis", "behaviorFlag": "Numeric benchmark: Legacy at X% of IG (£Y total). Peer target 10%. Pitches as legacy growth consultant.", "reportsTo": "Line Manager Name", "ceoFallback": "CEO Name", "salary": "£"}]}`;
+                const promptDeep = `STRICT RECRUITMENT INTELLIGENCE PROTOCOL: ${name}.
+                    1. AUDIT MANDATE: Scrape Charity Commission. Extract Total Voluntary Income vs Legacy Income.
+                    2. NUMERICAL BENCHMARK: If Legacy < 5% of Voluntary Income, you MUST flag a "Strategy Gap" lead.
+                    3. INTERIM SEARCH: Search aggregation boards AND Career portals. Hunt for 'Interim', 'Day rate', 'Maternity', 'Contract', 'Temporary'. 
+                    4. DATES: Find 'Role Posted Date' and 'Application Deadline'. 
+                    5. STAKEHOLDER: Find the CEO name.
+                    JSON ONLY: {"jobs": [{"title": "Forensic Signal", "adDate": "DD/MM", "closingDate": "DD/MM", "link": "url", "grade": "A|B|C", "type": "permanent|consultancy|gap", "gapType": "Legacy Gap|Crisis", "behaviorFlag": "Numeric benchmark: Legacy at X% of IG (£Y total). Win potential high. Pitch legacy strategy audit.", "reportsTo": "Mgr Name", "ceoFallback": "CEO Name", "salary": "£"}]}`;
 
                 try {
                     const res = await fetch(API_BASE + "?key=" + keys.gemini, {
@@ -374,7 +370,7 @@
                     if (parsed.jobs && parsed.jobs.length > 0) {
                         addTrace(`SUCCESS: Found ${parsed.jobs.length} signals for ${name}. Benchmarking complete.`);
                         setIntel(prev => [{ charityName: name, foundAt: new Date().toLocaleDateString(), jobs: parsed.jobs }, ...prev]);
-                    } else { addTrace(`CLEAN: No risk markers for ${name}.`); }
+                    } else { addTrace(`CLEAN: No high-risk signals for ${name}.`); }
 
                     setRegistry(prev => prev.map(c => c.name === name ? { ...c, [mode === 'deep' ? 'lastDeepAudit' : 'lastGeneralSweep']: new Date().toISOString() } : c));
                 } catch (err) { addTrace(`ERROR: Bypassed logic for ${name}.`); }
@@ -393,7 +389,7 @@
                 const auditTargets = [...registry].sort((a,b) => (a.lastDeepAudit ? new Date(a.lastDeepAudit) : 0) - (b.lastDeepAudit ? new Date(b.lastDeepAudit) : 0)).slice(0, 10);
                 for (let i = 0; i < auditTargets.length; i++) {
                     const char = auditTargets[i];
-                    setProgress({ active: true, percent: 50 + Math.round(((i + 1) / auditTargets.length) * 50), status: 'Forensic: ' + char.name });
+                    setProgress({ active: true, percent: 50 + Math.round(((i + 1) / auditTargets.length) * 50), status: 'Deep: ' + char.name });
                     await runGrounding(char.name, 'deep');
                     await new Promise(r => setTimeout(r, 2000));
                 }
@@ -424,11 +420,11 @@
                             <Icon name="zap" size={24} className="fill-current" />
                             <div>
                                 <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none text-left">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic text-left leading-none">V21.28 INVERTED</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic text-left leading-none">V21.29 FORENSIC</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setIsAdmin(!isAdmin)} className={'px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border ' + (isAdmin ? 'bg-slate-900 text-white border-slate-900 shadow-xl' : 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm')}>{isAdmin ? <Icon name="shield-check" size={14} /> : <Icon name="users" size={14} />} {isAdmin ? 'Admin Mode' : 'Colleague View'}</button>
+                            <button onClick={() => setIsAdmin(!isAdmin)} className={'px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 border ' + (isAdmin ? 'bg-slate-900 text-white border-slate-900 shadow-xl' : 'bg-blue-50 text-blue-600 border-blue-200 shadow-sm')}>{isAdmin ? <Icon name="shield-check" size={14} /> : <Icon name="users" size={14} />} {isAdmin ? 'Admin Mode' : 'Colleague View'}</button>
                             {isAdmin && <button onClick={() => setActiveModal('settings')} className="text-slate-300 hover:text-slate-900 transition-colors"><Icon name="settings" size={20} /></button>}
                         </div>
                     </nav>
@@ -469,7 +465,7 @@
                             </button>
                         </div>
 
-                        <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-200 overflow-hidden mb-8 text-left text-left">
+                        <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-200 overflow-hidden mb-8 text-left">
                             <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50/30 text-left">
                                 <div className="flex-1 max-w-md relative text-left">
                                     <Icon name="search" size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300" />
@@ -510,7 +506,7 @@
                                                         <div className="font-black uppercase text-xl tracking-tighter text-slate-900 leading-none">{c.name}</div>
                                                         <div className="flex flex-wrap gap-2 mt-3 text-left">
                                                             <span className={'urgency-badge border ' + (c.loxo === 'Client' ? 'bg-emerald-100 text-emerald-600 border-emerald-200' : 'bg-white text-slate-400 border-slate-200')}>{c.loxo || 'Target'}</span>
-                                                            {c.lastDeepAudit && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter italic">Last Audit: {new Date(c.lastDeepAudit).toLocaleDateString()}</span>}
+                                                            {c.lastDeepAudit && <span className="urgency-badge bg-slate-100 text-slate-500 border-slate-200 tracking-tighter italic">Deep Audit: {new Date(c.lastDeepAudit).toLocaleDateString()}</span>}
                                                             {action && <span className="urgency-badge bg-emerald-100 text-emerald-700 border-emerald-200 italic uppercase tracking-tighter text-left">Claimed: {action.owner}</span>}
                                                         </div>
                                                     </td>
@@ -520,7 +516,7 @@
                                                                 <div key={idx} className={'p-5 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden text-left ' + (j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : 'bg-white'))}>
                                                                     <span className={'absolute top-0 right-0 px-3 py-1 rounded-bl font-black text-[8px] uppercase ' + (getGradeStyle(j.grade))}>Grade {j.grade || 'C'}</span>
                                                                     <div className="text-xs font-black uppercase text-slate-900 pr-14 tracking-tight leading-none mb-2 text-left">{j.title}</div>
-                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Signal: {j.gapType || 'Forensic Trace'} • {j.behaviorFlag}</div>
+                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Forensic Trace: {j.gapType || 'Forensic Benchmarking'} • {j.behaviorFlag}</div>
                                                                     <div className="flex gap-4 text-left">
                                                                         <span className="text-[7px] font-black text-slate-400 uppercase border-r border-slate-100 pr-3 flex items-center gap-1"><Icon name="user" size={10} /> {j.reportsTo || j.ceoFallback || ''}</span>
                                                                         <div className="flex gap-2">
@@ -594,7 +590,7 @@
                                             <h2 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 leading-none text-left">
                                                 {activeModal === 'gap' ? 'Proactive Risk Desk' : activeModal === 'consultancy' ? 'Interim & Per-Day Desk' : 'Active search Intel'}
                                             </h2>
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic leading-none">Inverted Analysis for Tim & Rory</p>
+                                            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-2 text-left italic leading-none">Contextual Analysis for Tim & Rory</p>
                                         </div>
                                         <div className="flex gap-4 text-left">
                                             <div className="flex flex-col gap-1 text-left text-left text-left text-left">
@@ -624,9 +620,9 @@
                             <div className="bg-white rounded-[3.5rem] shadow-2xl max-w-md w-full p-12 text-left text-left text-left text-left">
                                 <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center leading-none text-left text-emerald-600">Security Core</h3>
                                 <div className="space-y-6 mt-8 text-left text-[10px] text-left text-left text-left text-left">
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left text-left">Gemini API Pro</label><input type="password" id="gemini-key-input" defaultValue={keys.gemini} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-emerald-50 transition-all text-left text-left text-left text-left" /></div>
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left text-left text-left">Loxo API Key</label><input type="password" id="loxo-key-input" defaultValue={keys.loxo} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-emerald-50 transition-all text-left text-left text-left text-left" /></div>
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">CC-API Sub Key</label><input type="password" id="cc-key-input" defaultValue={keys.cc} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-emerald-50 transition-all text-left text-left text-left text-left" /></div>
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">Gemini API Pro</label><input type="password" id="gemini-key-input" defaultValue={keys.gemini} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-emerald-50 transition-all text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left" /></div>
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">Loxo API Key</label><input type="password" id="loxo-key-input" defaultValue={keys.loxo} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-emerald-50 transition-all text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left" /></div>
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left">CC-API Sub Key</label><input type="password" id="cc-key-input" defaultValue={keys.cc} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-emerald-50 transition-all text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left text-left" /></div>
                                 </div>
                                 <button onClick={() => { 
                                     const g = document.getElementById('gemini-key-input').value;
@@ -646,8 +642,8 @@
             );
         }
 
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            if (root) root.render(<App />);
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        if (root) root.render(<App />);
     </script>
 </body>
 </html>
