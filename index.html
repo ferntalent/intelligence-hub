@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Hub V21.19 - Production</title>
+    <title>Intelligence Hub V21.20 - Production</title>
     <!-- PRODUCTION LIBS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -31,7 +31,7 @@
     <!-- Boot Sequence Loader -->
     <div id="boot-loader">
         <div class="font-black text-slate-400 uppercase tracking-widest text-[10px] italic animate-pulse mb-4">
-            Initializing Intelligence Hub V21.19...
+            Initializing Intelligence Hub V21.20...
         </div>
         <button onclick="localStorage.clear(); window.location.reload();" class="text-[8px] font-bold text-slate-300 uppercase hover:text-red-400 transition-colors tracking-tighter">
             Hanging? Click to Force Reset Hub
@@ -97,10 +97,10 @@
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="border-b border-slate-200">
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2">Entity Details</th>
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2">Role / Deadline</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 text-left">Entity & Location</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 text-left">Role & Signal Dates</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-center">Risk</th>
-                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[45%]">Strategic Narrative</th>
+                        <th className="py-4 text-[10px] font-black uppercase text-slate-400 px-2 w-[45%] text-left">Forensic Strategic Narrative</th>
                         <th className="py-4 text-[10px] font-black uppercase text-slate-400 text-right px-2">Loxo Sync</th>
                     </tr>
                 </thead>
@@ -117,6 +117,7 @@
                                         <span className="text-[7px] text-blue-500 font-bold uppercase">{l.cause || 'Sector'}</span>
                                         <span className="text-[7px] text-slate-400 font-bold uppercase border-l border-slate-200 pl-1">{l.location || 'UK'}</span>
                                     </div>
+                                    <div className="text-[7px] text-slate-300 font-bold mt-1 uppercase italic">Audit: {l.auditDate || 'New Discovery'}</div>
                                 </td>
                                 <td className="py-6 px-2">
                                     <div className="font-bold text-[11px] text-blue-600 uppercase italic leading-none">{l.title || 'Untitled Lead'}</div>
@@ -125,8 +126,8 @@
                                             <span className="text-[5px] font-black text-slate-400 uppercase tracking-tighter">Live</span>
                                             <span className="text-[8px] text-slate-600 font-black uppercase">{l.adDate || '??/??'}</span>
                                         </div>
-                                        <div className="flex flex-col bg-red-50 px-2 py-1 rounded">
-                                            <span className="text-[5px] font-black text-red-300 uppercase tracking-tighter">End</span>
+                                        <div className="flex flex-col bg-red-50 px-2 py-1 rounded border border-red-100">
+                                            <span className="text-[5px] font-black text-red-300 uppercase tracking-tighter">Closing</span>
                                             <span className="text-[8px] text-red-600 font-black uppercase italic">{l.closingDate || '??/??'}</span>
                                         </div>
                                     </div>
@@ -139,9 +140,10 @@
                                         ASSIGNMENT: {l.reportsTo || (l.ceoFallback ? 'CEO: ' + l.ceoFallback : 'Scanning...')}
                                     </div>
                                     <div className="font-bold text-slate-800 not-italic mb-1 uppercase text-[8px] tracking-widest text-emerald-600 flex items-center gap-1">
-                                        <Icon name="target" size={10} /> {l.gapType || 'Forensic Detail'}
+                                        <Icon name="target" size={10} /> {l.gapType || 'Forensic Insight'}
                                     </div>
                                     {l.behaviorFlag || 'Automated recruitment trace.'}
+                                    <div className="mt-2 text-[8px] font-black text-blue-500 uppercase tracking-widest leading-none italic">Source: {l.source || 'Discovery'}</div>
                                 </td>
                                 <td className="py-6 px-2 text-right">
                                     <div className="flex items-center justify-end gap-2 text-right">
@@ -151,7 +153,7 @@
                                         {action ? (
                                             <span className="text-[8px] font-black text-emerald-600 uppercase italic px-4">Synced</span>
                                         ) : (
-                                            <button onClick={() => onClaim(l.charity, 'Tim', l.reportsTo || l.ceoFallback)} className="bg-blue-600 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase shadow-md hover:bg-blue-700 active:scale-95 transition-all">Sync</button>
+                                            <button onClick={() => onClaim(l.charity, 'Tim', l.reportsTo || l.ceoFallback)} className="bg-blue-600 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase shadow-md hover:bg-blue-700 active:scale-95 transition-all">Sync to Loxo</button>
                                         )}
                                     </div>
                                 </td>
@@ -167,11 +169,13 @@
             const [registry, setRegistry] = useState(() => safeJsonLoad('hub_registry', []));
             const [intel, setIntel] = useState(() => safeJsonLoad('hub_intel', []));
             const [teamActions, setTeamActions] = useState(() => safeJsonLoad('hub_actions', {}));
+            const [connections, setConnections] = useState(() => safeJsonLoad('hub_connections', []));
+            const [schools, setSchools] = useState(() => safeJsonLoad('hub_schools', []));
             
             const [isAdmin, setIsAdmin] = useState(true);
             const [activeModal, setActiveModal] = useState(null); 
             const [searchQuery, setSearchQuery] = useState('');
-            const [logs, setLogs] = useState(['[SYSTEM] V21.19 Active. Boot trace confirmed.']);
+            const [logs, setLogs] = useState(['[SYSTEM] V21.20 Recovery Active. Systematic logic restored.']);
             const [progress, setProgress] = useState({ active: false, percent: 0, status: '' });
             const [emailInput, setEmailInput] = useState('');
 
@@ -185,11 +189,11 @@
 
             // Sync with localstorage after state updates
             useEffect(() => {
-                if (registry.length > 0) localStorage.setItem('hub_registry', JSON.stringify(registry));
+                if (registry && registry.length > 0) localStorage.setItem('hub_registry', JSON.stringify(registry));
             }, [registry]);
 
             useEffect(() => {
-                if (intel.length > 0) localStorage.setItem('hub_intel', JSON.stringify(intel));
+                if (intel && intel.length > 0) localStorage.setItem('hub_intel', JSON.stringify(intel));
             }, [intel]);
 
             useEffect(() => {
@@ -202,10 +206,17 @@
 
             const addLog = useCallback((m) => setLogs(p => ['[' + new Date().toLocaleTimeString() + '] ' + m, ...p].slice(0, 50)), []);
 
+            const resetMemory = () => {
+                if (window.confirm("Confirm: Wipe all memory? Registry and leads will be lost.")) {
+                    localStorage.clear();
+                    window.location.reload();
+                }
+            };
+
             const handleImport = (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length === 0) return;
-                setProgress({ active: true, percent: 5, status: 'Initializing Parser...' });
+                setProgress({ active: true, percent: 5, status: 'Initializing async parser...' });
                 
                 let currentFileIndex = 0;
                 const processNextFile = () => {
@@ -232,7 +243,11 @@
                             });
 
                             const s = data[0] || {};
-                            if (s['agencyscore'] || s['detailedreason']) {
+                            if (s['first name'] && s['company']) {
+                                setConnections(data); localStorage.setItem('hub_connections', JSON.stringify(data));
+                            } else if (s['establishmentname'] || s['headfirstname']) {
+                                setSchools(data); localStorage.setItem('hub_schools', JSON.stringify(data));
+                            } else if (s['agencyscore'] || s['detailedreason']) {
                                 const historical = data.map(r => ({
                                     charityName: r['charity'] || r['organisation'],
                                     jobs: [{
@@ -289,7 +304,7 @@
                                 }
                             }
                             currentFileIndex++;
-                            setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Mapping ' + file.name });
+                            setProgress({ active: true, percent: Math.round((currentFileIndex / files.length) * 100), status: 'Layering ' + file.name });
                             setTimeout(processNextFile, 100);
                         } catch (err) { currentFileIndex++; processNextFile(); }
                     };
@@ -383,6 +398,19 @@
                 setTimeout(() => setProgress({ active: false, percent: 0, status: '' }), 1500);
             };
 
+            const bulkExportIntel = () => {
+                let csv = "Type,Entity,Cause,Location,Role,Salary,AdDate,ClosingDate,StrategicReason,Link\n";
+                (intel || []).forEach(e => (e?.jobs || []).forEach(j => {
+                    const regData = registry.find(r => cleanName(r.name) === cleanName(e.charityName)) || {};
+                    csv += `"${j.type}","${e.charityName}","${regData.cause || ''}","${regData.location || ''}","${j.title}","${j.salary || ''}","${j.adDate || ''}","${j.closingDate || ''}","${j.behaviorFlag}","${j.link}"\n`;
+                }));
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = `Audit_Export_${new Date().toLocaleDateString()}.csv`;
+                a.click();
+            };
+
             const causes = useMemo(() => ['all', ...new Set(registry.map(r => r.cause).filter(Boolean))], [registry]);
             const locations = useMemo(() => ['all', ...new Set(registry.map(r => r.location).filter(Boolean))], [registry]);
 
@@ -393,7 +421,7 @@
                             <Icon name="zap" size={24} className="fill-current" />
                             <div>
                                 <h2 className="text-sm font-black uppercase tracking-tighter text-slate-900 leading-none text-left">Intelligence Hub</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.19 STABLE</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic leading-none text-left">V21.20 STABLE</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -446,13 +474,16 @@
                                 </div>
                                 {isAdmin && (<div className="flex items-center gap-3">
                                     <label className="cursor-pointer bg-slate-900 text-white px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl flex items-center gap-2">
-                                        <Icon name="download" size={14} /> Import Data 1-7<input type="file" className="hidden" multiple accept=".csv" onChange={handleImport} />
+                                        <Icon name="download" size={14} /> Import Sequence 1-7<input type="file" className="hidden" multiple accept=".csv" onChange={handleImport} />
                                     </label>
                                     <button className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 flex items-center gap-2 shadow-lg active:scale-95 transition-all" onClick={startBatchSweep}>
-                                        <Icon name="zap" size={14} /> Auto-Pilot Sweep (500/10)
+                                        <Icon name="zap" size={14} /> Auto-Pilot cycle (500/10)
+                                    </button>
+                                    <button onClick={bulkExportIntel} className="bg-white border border-slate-200 px-6 py-4 rounded-2xl text-[11px] font-black uppercase text-blue-600 hover:bg-blue-50 transition-all shadow-sm flex items-center gap-2">
+                                        <Icon name="file-text" size={14} /> Export Intel
                                     </button>
                                     <button onClick={resetMemory} className="text-[10px] font-black uppercase text-red-400 hover:text-red-600 ml-4 flex items-center gap-1">
-                                        <Icon name="trash-2" size={12} /> Reset
+                                        <Icon name="trash-2" size={12} /> Reset Hub
                                     </button>
                                 </div>)}
                             </div>
@@ -482,7 +513,7 @@
                                                                 <div key={idx} className={'p-5 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden text-left ' + (j.type === 'consultancy' ? 'consultancy-card' : (j.type === 'gap' ? 'gap-card' : 'bg-white'))}>
                                                                     <span className={'absolute top-0 right-0 px-3 py-1 rounded-bl font-black text-[8px] uppercase ' + (getGradeStyle(j.grade))}>Grade {j.grade || 'C'}</span>
                                                                     <div className="text-xs font-black uppercase text-slate-900 pr-14 tracking-tight leading-none mb-2 text-left">{j.title}</div>
-                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Signal: {j.gapType || 'Forensic Trace'} • {j.behaviorFlag}</div>
+                                                                    <div className="text-[9px] font-medium text-slate-500 mb-2 italic text-left">Audit Signal: {j.gapType || 'Forensic Trace'} • {j.behaviorFlag}</div>
                                                                     <div className="flex gap-4 text-left">
                                                                         <span className="text-[7px] font-black text-slate-400 uppercase border-r border-slate-100 pr-3 flex items-center gap-1"><Icon name="user" size={10} /> {j.reportsTo || j.ceoFallback || 'N/A'}</span>
                                                                         <div className="flex gap-2">
@@ -570,9 +601,9 @@
                             <div className="bg-white rounded-[3.5rem] shadow-2xl max-w-md w-full p-12 text-left">
                                 <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tighter italic text-center leading-none text-left text-blue-600">Security Core</h3>
                                 <div className="space-y-6 mt-8 text-left text-[10px]">
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left">Gemini API Pro</label><input type="password" id="gemini-key-input" defaultValue={keys.gemini} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left">Loxo API Key</label><input type="password" id="loxo-key-input" defaultValue={keys.loxo} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
-                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left">CC-API Sub Key</label><input type="password" id="cc-key-input" defaultValue={keys.cc} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left">Gemini API Pro</label><input type="password" id="gemini-key-input" defaultValue={keys.gemini} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left">Loxo API Key</label><input type="password" id="loxo-key-input" defaultValue={keys.loxo} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
+                                    <div><label className="block text-[9px] font-black uppercase text-slate-400 mb-2 tracking-widest ml-1 text-left text-left text-left">CC-API Sub Key</label><input type="password" id="cc-key-input" defaultValue={keys.cc} className="w-full bg-slate-50 px-6 py-5 rounded-2xl border outline-none font-mono text-xs focus:ring-4 ring-blue-50 transition-all text-left" /></div>
                                 </div>
                                 <button onClick={() => { 
                                     const g = document.getElementById('gemini-key-input').value;
