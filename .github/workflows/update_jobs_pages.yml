@@ -32,7 +32,7 @@ jobs:
           INPUT_CSV: "direct job pages.csv"
           OUTPUT_CSV: "direct job pages.csv"
           # Optional safety limit while testing; set to 0 for full run
-          MAX_ROWS: "0"
+          MAX_ROWS: "750"
         run: |
           python scripts/update_jobs_pages.py
 
