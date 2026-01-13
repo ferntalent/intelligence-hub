@@ -4,12 +4,11 @@ on:
   schedule:
     # every 6 hours (00:17, 06:17, 12:17, 18:17 UTC)
     - cron: "17 */6 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 permissions:
   contents: write
 
-# one run at a time; DO NOT cancel in-progress (so we don't stop short)
 concurrency:
   group: update-org-jobs-pages
   cancel-in-progress: false
@@ -34,3 +33,21 @@ jobs:
           pip install pandas requests beautifulsoup4 lxml
 
       - name: Run updater
+        env:
+          INPUT_CSV: direct job pages.csv
+          OUTPUT_CSV: direct job pages.csv
+          MAX_ROWS: "750"
+        run: |
+          python scripts/update_jobs_pages.py
+
+      - name: Commit & push if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "direct job pages.csv"
+          git commit -m "Update jobs pages (Vacancies column)" || echo "Nothing to commit"
+          git push
