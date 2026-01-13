@@ -1,0 +1,51 @@
+name: Update org jobs pages
+
+on:
+  schedule:
+    # daily at 03:17 UTC (change if you want)
+    - cron: "17 3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas requests beautifulsoup4 lxml
+
+      - name: Run updater
+        env:
+          INPUT_CSV: "direct job pages.csv"
+          OUTPUT_CSV: "direct job pages.csv"
+          # Optional safety limit while testing; set to 0 for full run
+          MAX_ROWS: "0"
+        run: |
+          python scripts/update_jobs_pages.py
+
+      - name: Commit & push if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "direct job pages.csv"
+          git commit -m "Update jobs pages (Vacancies column)"
+          git push
