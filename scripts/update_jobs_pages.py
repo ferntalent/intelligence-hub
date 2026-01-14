@@ -1,27 +1,29 @@
 import os
 import re
+import json
 import time
 import random
+import datetime as dt
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
 
+# ----------------------------
+# Config
+# ----------------------------
 INPUT_CSV = os.environ.get("INPUT_CSV", "direct job pages.csv")
 OUTPUT_CSV = os.environ.get("OUTPUT_CSV", INPUT_CSV)
 MAX_ROWS = int(os.environ.get("MAX_ROWS", "750"))  # 0 = no limit
-
-# If you ever want batching by offset later:
-START_ROW = int(os.environ.get("START_ROW", "0"))
+STATE_PATH = os.environ.get("STATE_PATH", ".state/jobs_pages_state.json")
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; IntelligenceHub/1.0)"}
 TIMEOUT = 12
 
-# Good and bad signals to reduce false positives like "membership" pages
 GOOD_URL_HINTS = [
     "career", "careers", "job", "jobs", "vacanc", "recruit", "work-with-us",
     "work-for-us", "working-for-us", "join-our-team", "join-us", "opportunit",
-    "vacancy", "our-people", "people-and-culture"
+    "vacancy"
 ]
 BAD_URL_HINTS = [
     "membership", "member", "join-our-community", "donate", "shop", "volunteer",
@@ -43,6 +45,14 @@ COMMON_PATHS = [
     "/about/work-with-us", "/about-us/join-our-team"
 ]
 
+# Faster but still polite
+SLEEP_MIN = float(os.environ.get("SLEEP_MIN", "0.06"))
+SLEEP_RAND = float(os.environ.get("SLEEP_RAND", "0.10"))
+
+
+# ----------------------------
+# Helpers
+# ----------------------------
 def norm_root(url: str) -> str:
     if not isinstance(url, str) or not url.strip():
         return ""
@@ -53,6 +63,7 @@ def norm_root(url: str) -> str:
     host = p.netloc.replace("www.", "")
     return f"{p.scheme}://{host}"
 
+
 def same_site(root: str, candidate: str) -> bool:
     try:
         r = urlparse(root).netloc.replace("www.", "")
@@ -61,10 +72,12 @@ def same_site(root: str, candidate: str) -> bool:
     except Exception:
         return False
 
+
 def safe_get(session: requests.Session, url: str) -> str:
     r = session.get(url, headers=HEADERS, timeout=TIMEOUT, allow_redirects=True)
     r.raise_for_status()
     return r.text
+
 
 def safe_head(session: requests.Session, url: str) -> str:
     r = session.head(url, headers=HEADERS, timeout=TIMEOUT, allow_redirects=True)
@@ -72,47 +85,37 @@ def safe_head(session: requests.Session, url: str) -> str:
         return r.url
     return ""
 
+
 def looks_jobish(url: str) -> bool:
     lu = url.lower()
     if any(bad in lu for bad in BAD_URL_HINTS):
         return False
     return any(g in lu for g in GOOD_URL_HINTS)
 
+
 def score_candidate(url: str, anchor_text: str = "") -> int:
-    """
-    Score candidates so we prefer real jobs pages over "membership/join" pages.
-    """
     lu = (url or "").lower()
     lt = (anchor_text or "").lower()
-
     score = 0
 
-    # Strong positives
     for good in ["vacanc", "career", "jobs", "recruit", "work-with-us", "work for us", "join our team"]:
         if good in lu:
             score += 12
         if good in lt:
             score += 10
 
-    # Mild positives
     if "opportun" in lu or "opportun" in lt:
         score += 6
 
-    # Hard negatives
     for bad in BAD_URL_HINTS:
         if bad in lu or bad in lt:
             score -= 40
 
-    # Prefer shorter, cleaner paths
     score += max(0, 10 - lu.count("/"))
-
     return score
 
+
 def validate_jobs_page(session: requests.Session, url: str) -> tuple[int, str]:
-    """
-    Fetch the page and check for hiring language.
-    Returns (confidence 0-100, type_label)
-    """
     try:
         html = safe_get(session, url)
         soup = BeautifulSoup(html, "html.parser")
@@ -120,9 +123,8 @@ def validate_jobs_page(session: requests.Session, url: str) -> tuple[int, str]:
         title = (soup.title.get_text(" ", strip=True) if soup.title else "").lower()
         body_text = soup.get_text(" ", strip=True).lower()
 
-        confidence = 30  # base if page loads
+        confidence = 30
 
-        # Strong positive signals
         if any(x in title for x in ["vacanc", "career", "jobs", "recruit"]):
             confidence += 25
         if any(x in body_text for x in ["apply now", "closing date", "salary", "job description", "specification"]):
@@ -130,34 +132,28 @@ def validate_jobs_page(session: requests.Session, url: str) -> tuple[int, str]:
         if any(x in body_text for x in ["current vacancies", "vacancies", "our vacancies", "latest vacancies"]):
             confidence += 20
 
-        # Negative signals
         if any(x in body_text for x in BAD_TEXT_HINTS):
             confidence -= 35
 
-        # Clamp
         confidence = max(0, min(100, confidence))
 
-        # Type classification
         if confidence >= 70:
             return confidence, "jobs_page"
         if confidence >= 45:
             return confidence, "maybe_jobs"
         return confidence, "unlikely_jobs"
-
     except Exception:
         return 0, "unreachable"
+
 
 def extract_sitemap_urls(xml_text: str) -> list[str]:
     return re.findall(r"<loc>(.*?)</loc>", xml_text, flags=re.I)
 
+
 def find_from_sitemap(session: requests.Session, root: str) -> tuple[str, str]:
-    """
-    Returns (jobs_page_url, sitemap_url_used)
-    """
     sitemaps = []
     sitemap_used = ""
 
-    # Try robots.txt first
     try:
         robots = safe_get(session, root + "/robots.txt")
         for line in robots.splitlines():
@@ -166,7 +162,6 @@ def find_from_sitemap(session: requests.Session, root: str) -> tuple[str, str]:
     except Exception:
         pass
 
-    # fallback
     if not sitemaps:
         sitemaps = [root + "/sitemap.xml", root + "/sitemap_index.xml"]
 
@@ -181,7 +176,6 @@ def find_from_sitemap(session: requests.Session, root: str) -> tuple[str, str]:
         except Exception:
             continue
 
-    # Filter to same site and jobish urls
     candidates = []
     for u in all_urls:
         if not isinstance(u, str):
@@ -195,7 +189,6 @@ def find_from_sitemap(session: requests.Session, root: str) -> tuple[str, str]:
     if not candidates:
         return "", sitemap_used
 
-    # Score and validate top few to avoid false positives
     candidates_sorted = sorted(candidates, key=lambda u: score_candidate(u), reverse=True)
     top = candidates_sorted[:6]
 
@@ -209,6 +202,7 @@ def find_from_sitemap(session: requests.Session, root: str) -> tuple[str, str]:
             best_url = u
 
     return best_url, sitemap_used
+
 
 def find_from_homepage(session: requests.Session, root: str) -> str:
     try:
@@ -227,7 +221,6 @@ def find_from_homepage(session: requests.Session, root: str) -> str:
             if not same_site(root, absu):
                 continue
 
-            # quick filter to reduce junk
             if any(k in (text or "").lower() for k in GOOD_TEXT_HINTS) or looks_jobish(absu):
                 candidates.append((absu, text))
 
@@ -235,7 +228,6 @@ def find_from_homepage(session: requests.Session, root: str) -> str:
         if not candidates:
             return ""
 
-        # pick best by score + a quick validation
         candidates_sorted = sorted(candidates, key=lambda x: score_candidate(x[0], x[1]), reverse=True)
         top = candidates_sorted[:8]
 
@@ -252,13 +244,13 @@ def find_from_homepage(session: requests.Session, root: str) -> str:
     except Exception:
         return ""
 
+
 def try_common_paths(session: requests.Session, root: str) -> str:
     for path in COMMON_PATHS:
         cand = root + path
         try:
             found = safe_head(session, cand)
             if found:
-                # validate quickly
                 conf, typ = validate_jobs_page(session, found)
                 if typ != "unlikely_jobs":
                     return found
@@ -266,24 +258,22 @@ def try_common_paths(session: requests.Session, root: str) -> str:
             pass
     return ""
 
+
 def find_jobs_page(session: requests.Session, org_url: str) -> dict:
     root = norm_root(org_url)
     if not root:
         return {"vacancies": "", "confidence": 0, "type": "no_url", "sitemap": ""}
 
-    # 1) sitemap
     jobs_url, sitemap_used = find_from_sitemap(session, root)
     if jobs_url:
         conf, typ = validate_jobs_page(session, jobs_url)
         return {"vacancies": jobs_url, "confidence": conf, "type": typ, "sitemap": sitemap_used}
 
-    # 2) homepage links
     jobs_url = find_from_homepage(session, root)
     if jobs_url:
         conf, typ = validate_jobs_page(session, jobs_url)
         return {"vacancies": jobs_url, "confidence": conf, "type": typ, "sitemap": sitemap_used}
 
-    # 3) common paths
     jobs_url = try_common_paths(session, root)
     if jobs_url:
         conf, typ = validate_jobs_page(session, jobs_url)
@@ -291,47 +281,70 @@ def find_jobs_page(session: requests.Session, org_url: str) -> dict:
 
     return {"vacancies": "", "confidence": 0, "type": "not_found", "sitemap": sitemap_used}
 
+
 def ensure_cols(df: pd.DataFrame) -> pd.DataFrame:
-    # Keep Vacancies exactly as you want (column H in your file)
     if "Vacancies" not in df.columns:
         df["Vacancies"] = ""
 
-    # Optional helpful columns (won't break anything)
-    if "Vacancies_Confidence" not in df.columns:
-        df["Vacancies_Confidence"] = ""
-    if "Vacancies_Type" not in df.columns:
-        df["Vacancies_Type"] = ""
-    if "Vacancies_Sitemap" not in df.columns:
-        df["Vacancies_Sitemap"] = ""
+    # optional extras
+    for col in ["Vacancies_Confidence", "Vacancies_Type", "Vacancies_Sitemap"]:
+        if col not in df.columns:
+            df[col] = ""
 
     return df
+
+
+def load_state() -> dict:
+    try:
+        if os.path.exists(STATE_PATH):
+            with open(STATE_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {"next_start_row": 0}
+
+
+def save_state(state: dict):
+    os.makedirs(os.path.dirname(STATE_PATH), exist_ok=True)
+    with open(STATE_PATH, "w", encoding="utf-8") as f:
+        json.dump(state, f, indent=2)
+
 
 def main():
     df = pd.read_csv(INPUT_CSV)
     df = ensure_cols(df)
 
     n = len(df)
-    start = max(0, START_ROW)
+    if n == 0:
+        print("CSV is empty, nothing to do.")
+        return
 
+    state = load_state()
+    start = int(state.get("next_start_row", 0)) % n
+
+    # run size
     if MAX_ROWS <= 0:
-        end = n
+        run_len = n
     else:
-        end = min(n, start + MAX_ROWS)
+        run_len = min(MAX_ROWS, n)
+
+    # We'll do a wrap-around slice so we keep moving forward
+    indices = list(range(start, min(n, start + run_len)))
+    if start + run_len > n:
+        indices += list(range(0, (start + run_len) - n))
 
     session = requests.Session()
 
     updated = 0
     checked = 0
 
-    for i in range(start, end):
-        row = df.iloc[i]
-        existing = row.get("Vacancies", "")
-
-        # Skip already filled
+    for i in indices:
+        existing = df.at[i, "Vacancies"]
         if isinstance(existing, str) and existing.strip():
+            checked += 1
             continue
 
-        org_url = str(row.get("URL", "") or "").strip()
+        org_url = str(df.at[i, "URL"] or "").strip()
         res = find_jobs_page(session, org_url)
 
         if res["vacancies"]:
@@ -343,15 +356,28 @@ def main():
 
         checked += 1
 
-        # polite delay (much faster than before)
-        time.sleep(0.06 + random.random() * 0.10)
+        # polite delay
+        time.sleep(SLEEP_MIN + random.random() * SLEEP_RAND)
 
-        # progress log (shows in Actions)
         if checked % 50 == 0:
-            print(f"Processed {checked} rows in this run, updated {updated} so far...")
+            print(f"Processed {checked}/{len(indices)} rows this run; updated {updated} so far...")
+
+    # Advance the pointer
+    next_start = (start + run_len) % n
+    state_out = {
+        "next_start_row": next_start,
+        "last_run_utc": dt.datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "rows_processed_last_run": len(indices),
+        "rows_updated_last_run": updated,
+    }
+    save_state(state_out)
 
     df.to_csv(OUTPUT_CSV, index=False)
-    print(f"Done. Checked {checked} rows, updated {updated}. Wrote {OUTPUT_CSV}")
+
+    print(f"Done. Checked {checked}, updated {updated}.")
+    print(f"Next start row will be {next_start}.")
+    print(f"Wrote {OUTPUT_CSV} and {STATE_PATH}.")
+
 
 if __name__ == "__main__":
     main()
