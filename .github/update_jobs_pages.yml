@@ -1,0 +1,20 @@
+      - name: Run updater
+        env:
+          INPUT_CSV: direct job pages.csv
+          OUTPUT_CSV: direct job pages.csv
+          MAX_ROWS: "750"
+          STATE_PATH: .state/jobs_pages_state.json
+        run: |
+          python scripts/update_jobs_pages.py
+
+      - name: Commit & push if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "direct job pages.csv" ".state/jobs_pages_state.json"
+          git commit -m "Update jobs pages (Vacancies column)" || echo "Nothing to commit"
+          git push
